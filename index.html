@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CARD: Contact-Anchored Retargeting for Dexterous Manipulation</title>
+<meta name="description" content="CARD retargets human hand demonstrations from video, tactile gloves and motion capture to robot hands by preserving where and how hard each finger touches, then replays them open-loop with a tactile tracking controller.">
+<meta property="og:title" content="CARD: Contact-Anchored Retargeting for Dexterous Manipulation">
+<meta property="og:description" content="Retargeting human hand demonstrations to robot hands by matching where each finger pad touches and how hard it pushes.">
+<meta property="og:image" content="assets/video/hero/hero.jpg">
+<meta name="theme-color" content="#0e0e10">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 28'%3E%3Crect x='1' y='1' width='20' height='26' rx='4' fill='%23121214' stroke='%23ececee' stroke-width='2'/%3E%3Ccircle cx='11' cy='15' r='3.4' fill='%236cc79b'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+<link rel="preload" as="image" href="assets/video/hero/hero.jpg" fetchpriority="high">
+<link rel="stylesheet" href="assets/css/site.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+<script type="module" src="assets/js/main.js"></script>
+</head>
+<body>
+<a class="skip" href="#idea">Skip to content</a>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-card" viewBox="0 0 22 28"><rect x="1" y="1" width="20" height="26" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="11" cy="15" r="3.4" fill="#6cc79b"/><path d="M11 15 L11 6.5" stroke="#e8731f" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-play" viewBox="0 0 14 14"><path d="M3 1.6v10.8L12.2 7z" fill="currentColor"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 14 14"><rect x="2.4" y="1.6" width="3.2" height="10.8" rx="1" fill="currentColor"/><rect x="8.4" y="1.6" width="3.2" height="10.8" rx="1" fill="currentColor"/></symbol>
+  <symbol id="i-replay" viewBox="0 0 16 16"><path d="M3.2 8a4.8 4.8 0 1 0 1.5-3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M3.6 1.8v3.3h3.3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-paper" viewBox="0 0 16 16"><path d="M4 1.5h5.2L12.5 5v9.5H4z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 1.7V5.2h3.3M6 8.5h4.5M6 11h4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-arxiv" viewBox="0 0 16 16"><rect x="4.5" y="1.5" width="9" height="11" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 4.5v9.2c0 .5.4.8.8.8h7.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-code" viewBox="0 0 16 16"><path d="M5.5 4L1.8 8l3.7 4M10.5 4l3.7 4-3.7 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-video" viewBox="0 0 16 16"><rect x="1.5" y="3" width="13" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6.6 5.9v4.2L10.2 8z" fill="currentColor"/></symbol>
+  <symbol id="i-quote" viewBox="0 0 16 16"><path d="M3 4.5h4v4H4.6c0 1.6.6 2.6 2 3M9 4.5h4v4h-2.4c0 1.6.6 2.6 2 3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-lr" viewBox="0 0 14 14"><path d="M4.5 3.5L1.5 7l3 3.5M9.5 3.5l3 3.5-3 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<!-- ============================================================ hero -->
+<header class="hero" id="top">
+  <div class="hero-media" aria-hidden="true">
+    <img class="hero-poster" src="assets/video/hero/hero.jpg" width="1920" height="1080" alt="">
+    <video id="hero-video" muted loop playsinline preload="none" data-video="assets/video/hero/hero.mp4" tabindex="-1"></video>
+  </div>
+  <div class="hero-shade"></div>
+  <nav class="hero-nav" aria-label="Primary">
+    <a class="wordmark" href="#top" aria-label="CARD, back to top"><svg aria-hidden="true"><use href="#i-card"/></svg>CARD</a>
+    <div class="hero-nav-links">
+      <a href="#idea">Idea</a><a href="#sources">Sources</a><a href="#method">Method</a><a href="#results">Results</a><a href="#hardware">Hardware</a><a href="#embodiments">Embodiments</a><a href="#cite">Cite</a>
+    </div>
+  </nav>
+  <div class="hero-content">
+    <h1>Contact-anchored<br>retargeting for<br><span class="acc">dexterous manipulation</span></h1>
+    <p class="hero-summary">CARD turns a human hand demonstration from phone video, a tactile glove or motion capture into robot joint targets and fingertip force targets. It solves for a robot pose whose finger pads sit where the human pressed and push the same way. It needs no simulator, and no object model for video or glove demonstrations.</p>
+    <!-- TODO(authors): the paper is still in anonymized CoRL submission mode. Replace with names, affiliations and links. -->
+    <p class="hero-authors">Anonymous authors<span class="note">CoRL 2026 submission</span></p>
+    <div class="hero-actions">
+      <a class="glass btn lg" href="#hardware"><svg aria-hidden="true"><use href="#i-video"/></svg>Videos</a>
+      <a class="glass btn lg" href="#cite"><svg aria-hidden="true"><use href="#i-quote"/></svg>BibTeX</a>
+      <!-- TODO(links): paper PDF, arXiv and code URLs -->
+      <a class="glass btn lg" href="#" aria-disabled="true" title="Link to come"><svg aria-hidden="true"><use href="#i-paper"/></svg>Paper</a>
+      <a class="glass btn lg" href="#" aria-disabled="true" title="Link to come"><svg aria-hidden="true"><use href="#i-arxiv"/></svg>arXiv</a>
+      <a class="glass btn lg" href="#" aria-disabled="true" title="Link to come"><svg aria-hidden="true"><use href="#i-code"/></svg>Code</a>
+    </div>
+  </div>
+  <div class="hero-bottom">
+    <a class="scroll-cue" href="#idea"><span></span>Six tasks replayed open-loop on three robot hands</a>
+    <div class="hero-now">
+      <span class="glass-tag plain" id="hero-label" aria-live="off"></span>
+      <button class="hero-toggle glass lg" type="button" aria-controls="hero-video" aria-label="Pause background video" hidden>
+        <svg class="i-pause" aria-hidden="true"><use href="#i-pause"/></svg><svg class="i-play" aria-hidden="true"><use href="#i-play"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="topnav" id="topnav">
+  <div class="wrap">
+    <a class="wordmark" href="#top"><svg aria-hidden="true"><use href="#i-card"/></svg>CARD</a>
+    <nav aria-label="Sections">
+      <a href="#idea">Idea</a><a href="#sources">Sources</a><a href="#method">Method</a><a href="#results">Results</a><a href="#hardware">Hardware</a><a href="#embodiments">Embodiments</a><a href="#cite">Cite</a>
+    </nav>
+  </div>
+</div>
+
+<main>
+<div class="bleed d2l" aria-hidden="true"></div>
+
+<!-- ============================================================ idea -->
+<section class="sec light" id="idea">
+  <div class="wrap">
+    <h2 class="reveal">A copied hand pose misses the contact</h2>
+    <p class="lead reveal">Most retargeting copies fingertip positions or joint angles from the human hand to the robot. Robot fingers have other lengths and other pads, so the copied pose misses the contact: the pad hovers, a neighboring finger takes it, or the pad meets the object at an angle where the push slips. In our tests the kinematic baselines leave a median gap of 20 to 25&nbsp;mm. CARD retargets the contact instead. For each region of the hand it keeps where the human pressed, which way and how hard (a contact anchor), then solves for a robot pose whose matching pad does the same.</p>
+
+    <div class="controls reveal" id="base-ctl">
+      <span class="label">Method</span>
+      <div class="seg glass light" role="group" aria-label="Retargeting method">
+        <span class="seg-thumb"></span>
+        <button type="button" aria-pressed="true" data-m="card">CARD</button>
+        <button type="button" aria-pressed="false" data-m="dexpilot">DexPilot</button>
+        <button type="button" aria-pressed="false" data-m="anyteleopk">AnyTeleop-K</button>
+        <button type="button" aria-pressed="false" data-m="fingertipik">Fingertip IK</button>
+        <button type="button" aria-pressed="false" data-m="init">Geometric init</button>
+      </div>
+    </div>
+    <div class="cmp-grid reveal" id="baselines">
+      <figure class="cmp-card" style="margin:0" data-clip="hanger">
+        <div class="cmp-stage">
+          <div class="human"><img src="assets/img/cut/baselines/hanger_human.webp" alt="Human hand pinching a coat-hanger bar, with orange contact anchors" loading="lazy"><span class="lbl glass-tag human">Human</span></div>
+          <div class="robot"></div>
+        </div>
+        <figcaption class="cmp-foot"><b>Coat hanger</b><span class="m-name">CARD</span></figcaption>
+      </figure>
+      <figure class="cmp-card" style="margin:0" data-clip="cup">
+        <div class="cmp-stage">
+          <div class="human"><img src="assets/img/cut/baselines/cup_human.webp" alt="Human fingers pinching the handle of a mug, with orange contact anchors" loading="lazy"><span class="lbl glass-tag human">Human</span></div>
+          <div class="robot"></div>
+        </div>
+        <figcaption class="cmp-foot"><b>Cup</b><span class="m-name">CARD</span></figcaption>
+      </figure>
+    </div>
+    <p class="cap reveal" id="base-cap">Two video clips retargeted to the SHARPA Wave. Orange spheres are the contact anchors taken from the human hand; the object is drawn only for reference.</p>
+
+    <div class="sub reveal">
+      <h3>What the solver scores at one contact</h3>
+      <div class="prose">
+        <p>A contact anchor <span class="tex">C_f=(c_f,\hat d_f,F_f)</span> holds a point on the surface of hand region <span class="tex">f</span>, a unit push direction into the object and a force. Within one frame the robot pad is scored on two things: the distance from its selected point <span class="tex">s^*_f</span> to <span class="tex">c_f</span>, and the angle between its normal and the push. A third term keeps that point from sliding between frames. The paper prices them so that a 30° tilt costs as much as a 5&nbsp;mm miss. Drag the pad, or turn it with the slider.</p>
+      </div>
+      <div class="anchor-demo" id="anchor-demo">
+        <div class="ad-stage">
+          <span class="hint">Drag the pad</span>
+          <svg viewBox="0 0 640 420" preserveAspectRatio="xMidYMid meet" role="img" aria-label="A robot finger pad near a contact anchor on an object surface">
+            <defs>
+              <linearGradient id="obj-g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9d7d2"/><stop offset="1" stop-color="#c9c6bf"/></linearGradient>
+              <linearGradient id="pad-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef1f5"/><stop offset="1" stop-color="#b9c2cd"/></linearGradient>
+              <marker id="arr-o" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#e8731f"/></marker>
+              <marker id="arr-b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#0e8fa3"/></marker>
+            </defs>
+            <rect x="0" y="262" width="640" height="158" fill="url(#obj-g)"/>
+            <path d="M0 262H640" stroke="#b3afa7" stroke-width="1.5"/>
+            <text x="18" y="400" font-size="13" fill="#8a867e">object surface</text>
+            <path id="ad-cone" fill="rgba(232,115,31,.10)" stroke="rgba(232,115,31,.35)" stroke-width="1" stroke-dasharray="3 4"/>
+            <line id="ad-push" stroke="#e8731f" stroke-width="3" marker-end="url(#arr-o)"/>
+            <circle id="ad-anchor" r="7" fill="#e8731f" stroke="#fff" stroke-width="2"/>
+            <text id="ad-anchor-l" font-size="14" fill="#b25616" font-style="italic">c</text>
+            <line id="ad-gap" stroke="#1d1d1f" stroke-width="1.5" stroke-dasharray="3 3"/>
+            <g id="ad-pad" style="cursor:grab">
+              <rect x="-70" y="-26" width="140" height="52" rx="26" fill="url(#pad-g)" stroke="#8d98a6" stroke-width="1.5"/>
+              <rect x="-70" y="-26" width="140" height="10" rx="5" fill="#7b8696" opacity=".5"/>
+              <line x1="0" y1="26" x2="0" y2="80" stroke="#0e8fa3" stroke-width="3" marker-end="url(#arr-b)"/>
+              <text x="10" y="70" font-size="14" fill="#0b6f7f" font-style="italic">n</text>
+              <text x="0" y="5" font-size="13" fill="#4a5361" text-anchor="middle">pad</text>
+            </g>
+            <circle id="ad-near" r="4.5" fill="#1d1d1f"/>
+          </svg>
+        </div>
+        <div class="ad-panel glass panel light">
+          <div class="ad-read">
+            <div><span class="k">Gap to anchor</span><span class="v" id="ad-gapv">0.0 mm</span></div>
+            <div><span class="k">Tilt from the push</span><span class="v" id="ad-tiltv">0°</span></div>
+          </div>
+          <div>
+            <div class="ad-bar" aria-hidden="true"><span class="reach" id="ad-b1"></span><span class="cone" id="ad-b2"></span></div>
+            <div class="ad-legend" style="margin-top:8px"><span><i style="background:var(--anchor)"></i>contact reach <span class="num" id="ad-t1">0</span></span><span><i style="background:#0e8fa3"></i>friction cone <span class="num" id="ad-t2">0</span></span></div>
+          </div>
+          <p class="ad-equiv" id="ad-equiv"></p>
+          <div class="ad-status"><span class="chip" id="ad-c1">Contact established</span><span class="chip" id="ad-c2">Inside the 45° cone</span></div>
+          <label for="ad-rot"><span>Pad rotation</span><span class="num" id="ad-rotv">0°</span></label>
+          <input id="ad-rot" type="range" min="-80" max="80" step="1" value="0">
+          <p class="cap" style="margin:0">Cost per anchor, in mm²: <span class="tex">\lVert s^*_f-c_f\rVert^2+\lambda r^2\,(1-\hat n\cdot\hat d_f)</span> with <span class="tex">\lambda=2</span>, <span class="tex">r=10</span>&nbsp;mm. The chips use the paper's evaluation rules: within 2&nbsp;mm on the palmar face, and a normal within 45° of the push.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="bleed l2d" aria-hidden="true"></div>
+
+<!-- ============================================================ sources -->
+<section class="sec dark" id="sources">
+  <div class="wrap">
+    <h2 class="reveal">Video, glove and motion capture become the same thing</h2>
+    <p class="lead reveal">The three sources measure different signals. CARD reduces each one to a MANO hand mesh over time (MANO is the standard parametric model of the human hand), a fixed set of hand regions (three per finger, plus the palm) shared by every source and every robot, and at most one contact anchor per region and frame. One set of solver weights then serves all three sources.</p>
+
+    <div class="controls reveal">
+      <div class="seg glass" role="group" aria-label="Demonstration source" data-tabs="src">
+        <span class="seg-thumb"></span>
+        <button type="button" aria-pressed="true" data-tab="video">Phone video</button>
+        <button type="button" aria-pressed="false" data-tab="glove">Tactile glove</button>
+        <button type="button" aria-pressed="false" data-tab="mocap">Motion capture</button>
+      </div>
+    </div>
+    <div class="panel-set reveal" data-panels="src">
+      <div data-panel="video" class="on">
+        <div class="src-layout">
+          <div class="media-card src-main">
+            <video muted loop playsinline preload="none" class="inview" data-src="assets/video/drive/vision_contact_cube_pick.mp4" poster="assets/video/drive/vision_contact_cube_pick.jpg" aria-label="Phone video of a hand picking up a Rubik's cube, with the predicted contact drawn on a MANO hand"></video>
+            <div class="tags br"><span class="glass-tag ours">Vid-HACO contact</span></div>
+          </div>
+          <div class="src-side">
+            <p class="txt">HaWoR tracks the hand in world frame and Vid-HACO, our video contact model, marks which of the 778 MANO vertices touch the object. Video measures no force, so forces come from a whole-clip balance step: the smallest smooth correction that drives each grasp's net wrench toward zero. 47 of the 67 clips we recorded are phone videos.</p>
+            <div class="tiles" data-tiles="video"></div>
+          </div>
+        </div>
+      </div>
+      <div data-panel="glove">
+        <div class="src-layout">
+          <div class="media-card src-main">
+            <img src="assets/img/slides/glove_cop_apple.jpg" alt="A hand in a black tactile glove holding an apple, beside a render of the per-finger centers of pressure" loading="lazy">
+            <div class="tags br"><span class="glass-tag plain">Measured pressure</span></div>
+          </div>
+          <div class="src-side">
+            <p class="txt">A 744-taxel pressure grid gives contact and pressure directly, each taxel registered to a personalized MANO mesh, and a wrist tracker gives the hand motion. Each region's center of pressure and force come from the taxel readings, and its push direction from the pressure-weighted surface normals. Glove clips are where contact is best measured, and where CARD keeps the most of it: 89% of anchor-frames.</p>
+            <div class="tiles" data-tiles="glove"></div>
+          </div>
+        </div>
+      </div>
+      <div data-panel="mocap">
+        <div class="src-layout">
+          <div class="media-card src-main pair">
+            <img src="assets/img/cut/gallery/mocap_power_frame.webp" alt="Motion capture: tracked hand and scanned bottle in a power grasp" loading="lazy">
+            <img src="assets/img/cut/gallery/mocap_power_contact.webp" alt="The same frame's contact on the MANO hand from the glove taxels" loading="lazy">
+            <div class="tags br"><span class="glass-tag plain">Tracked hand and object</span></div>
+          </div>
+          <div class="src-side">
+            <p class="txt">An OptiTrack-rigged hand wearing the same glove adds drift-free wrist motion and a tracked object mesh. Public datasets with annotated hands and objects, such as GRAB, enter through their own annotations; the 100 GRAB clips are where CARD is compared with ReGrind, which needs the object mesh.</p>
+            <div class="tiles" data-tiles="mocap"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="cap reveal">Hover or tap a tile to see the contact on the MANO hand. Video contact is binary per vertex; glove and motion-capture contact is the taxel reading.</p>
+
+    <div class="sub" id="vidhaco">
+      <h3 class="reveal">Contact from video: Vid-HACO</h3>
+      <div class="prose reveal">
+        <p>Vid-HACO reads an 8-frame clip with a V-JEPA&nbsp;2.1 encoder and a DPT decoder and predicts contact for each MANO vertex, plus whether the hand touches anything in the frame. It is trained on 1.55M frames from 12 datasets. On HRDexDB, which it never saw, vertex F1 goes from 63.3 to 67.2 and average precision from 54.3 to 72.2 against the released HACO, the prior image-based hand-contact model. The clips show both models on the same in-the-wild video.</p>
+      </div>
+      <div class="player reveal" data-sync style="--n:2; --ar: 948 / 490">
+        <div class="cards">
+          <div class="media-card"><video muted playsinline preload="none" data-src="assets/video/drive/contact_haco_toytruck_screwdriver.mp4" poster="assets/video/drive/contact_haco_toytruck_screwdriver.jpg" aria-label="HACO contact prediction on a toy truck assembly clip"></video><div class="tags tr"><span class="glass-tag kin">HACO</span></div></div>
+          <div class="media-card"><video muted playsinline preload="none" data-src="assets/video/drive/contact_ours_toytruck_screwdriver.mp4" poster="assets/video/drive/contact_ours_toytruck_screwdriver.jpg" aria-label="Vid-HACO contact prediction on the same clip"></video><div class="tags tr"><span class="glass-tag ours">Vid-HACO</span></div></div>
+        </div>
+      </div>
+      <p class="cap reveal">Each frame's header reports whether the right hand is in contact. Both clips play on one clock; drag the bar to compare a moment. These clips were made with an earlier version of the model.</p>
+
+      <div class="chart-row reveal" style="margin-top:42px">
+        <div>
+          <div class="controls" style="margin-top:0">
+            <div class="seg glass small" role="group" aria-label="Benchmark" data-chart="vidhaco">
+              <span class="seg-thumb"></span>
+              <button type="button" aria-pressed="false" data-v="val">Validation split</button>
+              <button type="button" aria-pressed="true" data-v="hrdexdb">HRDexDB, held out</button>
+            </div>
+          </div>
+          <div class="chart-card"><video class="chart" muted playsinline preload="none" data-rest="end" data-group="vidhaco" data-src="assets/video/charts/vidhaco_hrdexdb.mp4" poster="assets/video/charts/vidhaco_hrdexdb.jpg" aria-label="Bar chart of vertex F1, average precision and frame F1 for HACO, HACO retrained, and Vid-HACO"></video><button class="replay glass light" type="button" aria-label="Replay chart"><svg aria-hidden="true"><use href="#i-replay"/></svg></button></div>
+        </div>
+        <div class="prose" id="vidhaco-text">
+          <p>Retraining HACO on our data (HACO-R) lifts its in-distribution F1 from 57.1 to 74.5 but buys nothing on HRDexDB, so the gain comes from the model: video input, a video-pretrained encoder and training on every frame. Both HACO models flag contact on every frame and score exactly the trivial frame F1 of 75.9, where Vid-HACO reaches 95.3 held out. In CARD, a contact predicted during a reach would pull a robot finger onto empty space.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="bleed d2l" aria-hidden="true"></div>
+
+<!-- ============================================================ method -->
+<section class="sec light" id="method">
+  <div class="wrap">
+    <h2 class="reveal">From anchors to a robot pose</h2>
+    <p class="lead reveal">Each frame is solved for the wrist pose and all joint angles of the robot hand, <span class="tex">q=(t,R,\theta)</span>, 22 joints on the SHARPA Wave. No simulator enters the solve. Penetration is checked against the convex hull of the anchors for video, and against the tracked mesh for motion capture and GRAB. Click a stage to find it in the paper's overview figure.</p>
+
+    <div class="pipe reveal">
+      <div class="pipe-fig" id="pipe-fig">
+        <img loading="lazy" src="assets/img/paper/fig_source_data.jpg" alt="CARD overview: a glove demonstration on a Rubik's cube becomes a unified hand contact representation, a geometric initialization, a retargeted SHARPA hand, and a tactile tracking replay on hardware" width="1200" height="616">
+      </div>
+      <a class="cap pipe-full" href="assets/img/paper/fig_source_data.jpg" target="_blank" rel="noopener">Open the figure full size</a>
+      <div class="steps" id="steps">
+        <button class="step" type="button" aria-expanded="true" data-hot="uhcr"><b>Unified representation</b><span class="more-t">Contacting vertices in each region are reduced to a pressure-weighted centroid, filtered in time and projected back onto the hand, giving <span class="tex">c_f</span>. The push <span class="tex">\hat d_f</span> is the pressure-weighted mean surface normal, pointed into the object, and the force is the patch's total pressure, rebalanced over the clip for video and motion capture.</span></button>
+        <button class="step" type="button" aria-expanded="false" data-hot="init"><b>Geometric initialization</b><span class="more-t">Human joint angles are copied to the robot in closed form, the thumb goes through a fixed affine map from its bone directions and pad normal, and the wrist is placed so the fingertip centroids line up. It takes under 1&nbsp;ms per frame and on its own beats every kinematic baseline.</span></button>
+        <button class="step" type="button" aria-expanded="false" data-hot="retarget"><b>Contact-anchored retargeting</b><span class="more-t">A sampler on the GPU moves the matching pad onto each anchor, turns its normal toward the push and keeps a reached contact from sliding across the pad. Free fingers follow the human; self-collision and object penetration are penalized.</span></button>
+        <button class="step" type="button" aria-expanded="false" data-hot="replay"><b>Tactile tracking replay</b><span class="more-t">The robot replays the joint trajectory while a force loop on each fingertip closes the finger until the measured force reaches its target.</span></button>
+      </div>
+    </div>
+
+    <div class="eq-grid reveal">
+      <div class="eq">
+        <div class="tex display">q^{\star}=\arg\min_{q\in\mathcal Q}\;E_{\mathrm{con}}(q)+E_{\mathrm{sty}}(q)+E_{\mathrm{smo}}(q)+E_{\mathrm{col}}(q)</div>
+        <p>Contact, style for the free fingers, smoothness from the previous frame, and collision. One set of weights serves video, glove and motion capture. The objective is non-smooth, so each frame runs 16 rounds of 1024 candidates on the GPU, warm-started halfway between the previous solution and the initializer.</p>
+      </div>
+      <div class="eq">
+        <div class="tex display">E_{\mathrm{con}}=\sum_{f}\rho_f^2\Big[w_c^2\big(\lVert s^*_f-c_f\rVert^2+\lambda r^2(1-\hat n(s^*_f)\cdot\hat d_f)\big)+w_{\mathrm{fix}}^2\lVert s^*_f-\Delta T_f\,s^{*-}_f\rVert^2\Big]</div>
+        <p>Reach, friction cone and anti-slip at the selected pad point <span class="tex">s^*_f</span>. The force weight <span class="tex">\rho_f=1+\tfrac12F_f/\max F</span> makes harder contacts pull harder.</p>
+      </div>
+    </div>
+
+    <div class="sub">
+      <h3 class="reveal">Starting from the initializer, the contact solve raises contact from 25% to 44%</h3>
+      <p class="prose reveal">The closed-form initializer alone places the demonstrated contact on 25.2% of anchor-frames on our clips, ten times more than the kinematic baselines. The contact solve raises that to 43.6%, and the share of anchor-frames where the pad also faces the push from 5.7% to 18.3%. Drag across a render to compare.</p>
+      <div class="controls reveal">
+        <div class="seg glass light small" role="group" aria-label="Clip" id="wipe-ctl">
+          <span class="seg-thumb"></span>
+          <button type="button" aria-pressed="true" data-c="cup">Cup</button>
+          <button type="button" aria-pressed="false" data-c="hanger">Hanger</button>
+          <button type="button" aria-pressed="false" data-c="can">Can</button>
+          <button type="button" aria-pressed="false" data-c="cards">Cards</button>
+          <button type="button" aria-pressed="false" data-c="marker">Marker</button>
+          <button type="button" aria-pressed="false" data-c="bowl">Bowl</button>
+        </div>
+      </div>
+      <div class="wipe reveal" id="wipe" style="--x:50%">
+        <img class="under" loading="lazy" src="assets/img/cut/init/cup_init.webp" alt="Geometric initialization of the robot hand on a cup">
+        <div class="top"><img loading="lazy" src="assets/img/cut/init/cup_card.webp" alt="CARD solution on the same cup"></div>
+        <div class="bar"><span class="knob glass light"><svg aria-hidden="true"><use href="#i-lr"/></svg></span></div>
+        <span class="side l">Geometric init</span><span class="side r">CARD</span>
+        <input type="range" min="0" max="100" value="50" step="0.1" aria-label="Wipe between geometric initialization and CARD">
+      </div>
+      <p class="cap reveal">The initializer is left of the bar and CARD right of it; the solve moves the pads the last millimeters onto the orange contact anchors.</p>
+    </div>
+
+    <div class="sub">
+      <h3 class="reveal">Retargeted from a phone video, drawn back into the frame</h3>
+      <p class="prose reveal">A visualization, not part of the paper's evaluation: the person is masked and painted out of the original shot, and the retargeted SHARPA Wave on its arm is composited where their hand was.</p>
+      <div class="controls reveal">
+        <div class="seg glass light small" role="group" aria-label="Video clip" id="v2r-ctl">
+          <span class="seg-thumb"></span>
+          <button type="button" aria-pressed="true" data-v="cube">Rubik's cube</button>
+          <button type="button" aria-pressed="false" data-v="can">Soda can</button>
+          <button type="button" aria-pressed="false" data-v="spray">Spray bottle</button>
+        </div>
+      </div>
+      <div class="player vid2robot reveal" data-sync id="v2r" style="--n:2; --ar: 960 / 430">
+        <div class="cards">
+          <div class="media-card"><video muted playsinline preload="none" data-src="assets/video/v2r/cube_human.mp4" poster="assets/video/v2r/cube_human.jpg" aria-label="Original video"></video><div class="tags"><span class="glass-tag human">Human video</span></div></div>
+          <div class="media-card"><video muted playsinline preload="none" data-src="assets/video/v2r/cube_robot.mp4" poster="assets/video/v2r/cube_robot.jpg" aria-label="The same video with the retargeted robot hand composited in"></video><div class="tags"><span class="glass-tag ours">CARD on SHARPA Wave</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ results -->
+<section class="sec light" id="results">
+  <div class="wrap">
+    <h2 class="reveal">Contact kept on 43% of contact frames, against under 5% for kinematic retargeting</h2>
+    <p class="lead reveal">We retarget 167 demonstrations to the SHARPA Wave: 67 clips we recorded (47 phone videos, 18 glove clips, 2 motion-capture clips) and 100 GRAB clips with ground-truth object meshes. A contact counts as established when the anchor is within 2&nbsp;mm of the assigned link on its palmar face. Rates count anchor-frames: one contact anchor in one frame.</p>
+
+    <div class="controls reveal" id="fid-ctl">
+      <div class="seg glass light small" role="group" aria-label="Test bed" data-k="bed">
+        <span class="seg-thumb"></span>
+        <button type="button" aria-pressed="true" data-v="own67">Our 67 clips</button>
+        <button type="button" aria-pressed="false" data-v="grab">GRAB, 100 clips</button>
+      </div>
+      <div class="seg glass light small" role="group" aria-label="Metric" data-k="metric">
+        <span class="seg-thumb"></span>
+        <button type="button" aria-pressed="true" data-v="contact">Contact rate</button>
+        <button type="button" aria-pressed="false" data-v="region">Correct finger</button>
+        <button type="button" aria-pressed="false" data-v="cone">In cone</button>
+        <button type="button" aria-pressed="false" data-v="gap">Gap</button>
+        <button type="button" aria-pressed="false" data-v="pen">Penetration</button>
+      </div>
+    </div>
+    <div class="chart-row reveal">
+      <div class="chart-card"><video class="chart" id="fid-video" muted playsinline preload="none" data-rest="end" data-src="assets/video/charts/fidelity_own67_contact.mp4" poster="assets/video/charts/fidelity_own67_contact.jpg" aria-label="Bar chart of contact fidelity per retargeting method"></video><button class="replay glass light" type="button" aria-label="Replay chart"><svg aria-hidden="true"><use href="#i-replay"/></svg></button></div>
+      <div class="prose" aria-live="polite"><p id="fid-text"></p></div>
+    </div>
+    <details class="fallback-table reveal">
+      <summary>Show the full table</summary>
+      <div class="table-wrap">
+      <table>
+        <thead><tr><th></th><th>CARD</th><th>DexPilot</th><th>AnyTeleop-K</th><th>AnyTeleop-P</th><th>ReGrind</th><th>CARD (init only)</th></tr></thead>
+        <tbody>
+          <tr><th colspan="7" style="text-align:left;font-weight:600;padding-top:12px">Our 67 clips (video, glove, motion capture)</th></tr>
+          <tr><td>Contact rate (%)</td><td><b>43.6</b></td><td>2.5</td><td>2.5</td><td>2.4</td><td>–</td><td>25.2</td></tr>
+          <tr><td>Correct finger (%)</td><td><b>41.3</b></td><td>2.5</td><td>2.5</td><td>2.4</td><td>–</td><td>23.9</td></tr>
+          <tr><td>In cone (%)</td><td><b>18.3</b></td><td>1.0</td><td>1.1</td><td>1.3</td><td>–</td><td>5.7</td></tr>
+          <tr><td>Gap, median (mm)</td><td><b>3.31</b></td><td>24.23</td><td>24.55</td><td>25.06</td><td>–</td><td>11.52</td></tr>
+          <tr><th colspan="7" style="text-align:left;font-weight:600;padding-top:12px">GRAB (100 clips)</th></tr>
+          <tr><td>Contact rate (%)</td><td><b>43.1</b></td><td>4.9</td><td>4.9</td><td>4.6</td><td>22.5</td><td>19.6</td></tr>
+          <tr><td>Correct finger (%)</td><td><b>40.6</b></td><td>4.8</td><td>4.9</td><td>4.5</td><td>20.7</td><td>17.8</td></tr>
+          <tr><td>In cone (%)</td><td><b>16.2</b></td><td>1.7</td><td>1.7</td><td>1.7</td><td>5.2</td><td>3.8</td></tr>
+          <tr><td>Gap, median (mm)</td><td><b>3.56</b></td><td>20.90</td><td>20.45</td><td>20.66</td><td>7.86</td><td>13.78</td></tr>
+          <tr><td>Penetration, median (mm)</td><td><b>7.96</b></td><td>12.71</td><td>12.79</td><td>13.02</td><td>9.80</td><td>11.15</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p class="cap">Rates pooled over anchor-frames. ReGrind needs the object mesh, so it runs on GRAB only.</p>
+    </details>
+
+    <div class="sub">
+      <h3 class="reveal">The friction-cone term trades reach for direction</h3>
+      <div class="chart-row reveal">
+        <div class="chart-card tall"><video class="chart" muted playsinline preload="none" data-rest="end" data-src="assets/video/charts/ablation_tradeoff.mp4" poster="assets/video/charts/ablation_tradeoff.jpg" aria-label="Scatter of contact rate against in-cone rate for every ablation variant"></video><button class="replay glass light" type="button" aria-label="Replay chart"><svg aria-hidden="true"><use href="#i-replay"/></svg></button></div>
+        <div class="prose">
+          <p>Ablations on 20 video clips. Without the friction-cone term the solver reaches more anchors, 69.1% against 61.9%, but only 54.6% of them with a pad that faces the push. With it, every variant stays at about 80% in cone, and the full method reaches 82.2%.</p>
+          <p>The human-preference blend <span class="tex">\alpha_f=0.15</span>, a small pull toward where the human touched along the link, adds contact in either regime; at <span class="tex">\alpha_f=1</span> it over-constrains the pad. Removing the geometric initializer costs about ten points of contact.</p>
+          <p class="cap" style="margin-top:12px">This bed is 20 video clips with the upstream HACO anchors (4,297 anchor-frames), and gap and penetration are per-clip medians and maxima, so its numbers are not comparable with the table above.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="bleed l2d" aria-hidden="true"></div>
+
+<!-- ============================================================ hardware -->
+<section class="sec dark" id="hardware">
+  <div class="wrap">
+    <h2 class="reveal">Open-loop replay on real hands</h2>
+    <p class="lead reveal">The retargeted output is a joint trajectory plus a target force for every finger. A 7-DoF arm follows the wrist and the hand replays the rest open-loop: no object pose estimate and no policy, so a replay works only if the retargeted contacts and forces are right.</p>
+
+    <div class="hw reveal" id="hw">
+      <div>
+        <div class="media-card hw-stage">
+          <video id="hw-video" muted playsinline preload="none" aria-label="Robot hand replaying a retargeted demonstration"></video>
+          <div class="tags"><span class="glass-tag ours" id="hw-tag">SHARPA Wave</span></div>
+        </div>
+        <div class="transport glass" id="hw-transport">
+          <button class="pp" type="button" aria-label="Play"><svg class="i-play" aria-hidden="true"><use href="#i-play"/></svg><svg class="i-pause" aria-hidden="true"><use href="#i-pause"/></svg></button>
+          <div class="scrub" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="track"><div class="fill"></div></div><div class="ticks"></div><span class="knob"></span></div>
+          <span class="clock">0:00 / 0:00</span>
+        </div>
+        <div class="frames" id="hw-frames" aria-label="Frames shown in the paper"></div>
+        <p class="cap">The four stills are the frames printed in the paper's hardware figure; click one to jump there.</p>
+      </div>
+      <div class="hw-side">
+        <div class="hw-list" id="hw-list" role="group" aria-label="Task"></div>
+        <div class="media-card hw-demo" id="hw-demo-card">
+          <video id="hw-demo" muted loop playsinline preload="none" aria-label="Human demonstration of the task"></video>
+          <div class="tags"><span class="glass-tag human">Human demonstration</span></div>
+        </div>
+        <p class="hw-desc" id="hw-desc"></p>
+      </div>
+    </div>
+
+    <div class="sub" id="tracker">
+      <h3 class="reveal">Same trajectory, tactile tracker on and off</h3>
+      <div class="prose reveal">
+        <p>The tracker turns each finger's force error into a curl <span class="tex">\kappa_f\in[0,1]</span> that closes the finger past its retargeted joint target, and adds a feedforward torque <span class="tex">J_f^{\top}F^{\mathrm{des}}_f\hat d_f</span> through the fingertip Jacobian. Five finger loops run at 100&nbsp;Hz on the SHARPA Wave's fingertip sensors. With position replay alone the hammer and the cup slip out during the lift, and the mustard bottle is held but nothing comes out.</p>
+      </div>
+      <div class="controls reveal">
+        <div class="seg glass small" role="group" aria-label="Task" id="onoff-ctl">
+          <span class="seg-thumb"></span>
+          <button type="button" aria-pressed="true" data-t="hammer">Hammer lift</button>
+          <button type="button" aria-pressed="false" data-t="cup">Cup lift</button>
+          <button type="button" aria-pressed="false" data-t="mustard">Mustard dispensing</button>
+        </div>
+      </div>
+      <div class="onoff reveal" id="onoff">
+        <div class="media-card" data-side="on"><img src="assets/img/cut/tactile/hammer_on.webp" alt="With the tactile tracker the hammer stays in the grasp" loading="lazy"><div class="tags"><span class="glass-tag ours">Tracker on</span></div><div class="tags br"><span class="glass-tag ours res">Held</span></div></div>
+        <div class="media-card" data-side="off"><img src="assets/img/cut/tactile/hammer_off.webp" alt="Without the tracker the hammer slips out" loading="lazy"><div class="tags"><span class="glass-tag plain">Position replay only</span></div><div class="tags br"><span class="glass-tag bad res">Slipped</span></div></div>
+      </div>
+
+      <div class="chart-row reveal" style="margin-top:42px" id="force-row">
+        <div>
+          <div class="controls" style="margin-top:0">
+            <div class="seg glass small" role="group" aria-label="Force tracking test" data-chart="force">
+              <span class="seg-thumb"></span>
+              <button type="button" aria-pressed="true" data-v="grasp">Three-finger grasp</button>
+              <button type="button" aria-pressed="false" data-v="periodic">Periodic target</button>
+            </div>
+          </div>
+          <div class="chart-card"><video class="chart" muted playsinline preload="none" data-rest="end" data-group="force" data-src="assets/video/charts/force_grasp.mp4" poster="assets/video/charts/force_grasp.jpg" aria-label="Measured fingertip force following its target"></video><button class="replay glass light" type="button" aria-label="Replay chart"><svg aria-hidden="true"><use href="#i-replay"/></svg></button></div>
+        </div>
+        <div class="prose" id="force-text">
+          <p>With step targets of 9.7&nbsp;N on the thumb, 7&nbsp;N on the middle finger and 2.6&nbsp;N on the index, each force reaches its set-point within about a second, with the thumb overshooting while the object settles; on release every finger returns to zero within a second. Dashed lines are targets.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="sub">
+      <h3 class="reveal">More replays on the SHARPA Wave</h3>
+      <p class="prose reveal">Clips from an earlier version of the project, then called TART, retargeted from glove and video demonstrations, and two other SHARPA Wave runs whose demonstration source is not recorded. In the side-by-side clips the robot is on the left and the human video it was retargeted from is on the right.</p>
+      <div class="more reveal" id="more">
+        <div class="media-card more-stage"><video id="more-video" muted loop playsinline preload="none" aria-label="Robot replay"></video><div class="tags"><span class="glass-tag plain" id="more-tag"></span></div></div>
+        <div class="more-nav" id="more-nav" role="group" aria-label="Replay"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="bleed d2l" aria-hidden="true"></div>
+
+<!-- ============================================================ embodiments -->
+<section class="sec light" id="embodiments">
+  <div class="wrap">
+    <h2 class="reveal">A new hand needs only a semantic map</h2>
+    <p class="lead reveal">The anchors live on the human hand, so moving to another robot means saying which robot body takes each human region and which face of it grasps. Anchors, cost terms and weights stay the same. Grasp structure and contact timing carry over all the way to a parallel-jaw gripper; only the contact position along each link is lost, since two pads cannot express it.</p>
+
+    <div class="controls reveal">
+      <div class="seg glass light" role="group" aria-label="Robot hand" id="emb-ctl">
+        <span class="seg-thumb"></span>
+        <button type="button" aria-pressed="true" data-h="sharpa">SHARPA Wave</button>
+        <button type="button" aria-pressed="false" data-h="wuji">Wuji Hand 2</button>
+        <button type="button" aria-pressed="false" data-h="dex3">Unitree Dex3-1</button>
+        <button type="button" aria-pressed="false" data-h="gripper">Parallel-jaw gripper</button>
+      </div>
+    </div>
+    <div class="emb reveal" id="emb">
+      <div class="emb-card" data-demo="hammer"><div class="head"><b>Hammer</b><span>GRAB demonstration</span></div><div class="emb-pair"><figure><img data-role="human" alt="Human source grasp on a hammer" loading="lazy"><figcaption>Human</figcaption></figure><figure><div class="swap" data-role="robot"></div><figcaption class="h-name">SHARPA Wave</figcaption></figure></div></div>
+      <div class="emb-card" data-demo="cube"><div class="head"><b>Cube</b><span>GRAB demonstration</span></div><div class="emb-pair"><figure><img data-role="human" alt="Human source grasp on a cube" loading="lazy"><figcaption>Human</figcaption></figure><figure><div class="swap" data-role="robot"></div><figcaption class="h-name">SHARPA Wave</figcaption></figure></div></div>
+    </div>
+    <div class="emb-map reveal">
+      <div>
+        <div class="map-img"><div class="swap" id="emb-map"></div></div>
+        <p class="note" id="emb-note" style="margin-top:14px"></p>
+      </div>
+      <div id="emb-real"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ limitations -->
+<section class="sec light" id="limits">
+  <div class="wrap">
+    <h2 class="reveal" style="font-size:clamp(26px,2.6vw,34px)">Retargeting is offline and replay is open-loop</h2>
+    <p class="lead reveal">Retargeting quality is bounded by the demonstration. Retargeting runs offline, the full solver runs on one high-DoF hand, and open-loop replay cannot recover when the object ends up far from where the human had it. That calls for closing the loop with policies trained on CARD data.</p>
+  </div>
+</section>
+
+<div class="bleed l2d" aria-hidden="true"></div>
+
+<section class="sec dark" id="cite">
+  <div class="wrap">
+    <h2 class="reveal" style="font-size:clamp(26px,2.6vw,34px)">Citation</h2>
+    <div class="bib reveal" id="bib"><button class="bib-copy glass btn" type="button">Copy</button><code id="bib-text">@inproceedings{card2026,
+  title     = {{CARD}: Contact-Anchored Retargeting for Dexterous Manipulation},
+  author    = {Anonymous Authors},
+  booktitle = {Conference on Robot Learning (CoRL)},
+  year      = {2026}
+}</code></div>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <span>CARD: Contact-Anchored Retargeting for Dexterous Manipulation</span>
+    <a href="#top">Back to top</a>
+  </div>
+</footer>
+</body>
+</html>
