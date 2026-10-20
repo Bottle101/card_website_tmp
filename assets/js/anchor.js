@@ -94,4 +94,22 @@ export function initAnchorDemo(root) {
     e.preventDefault(); draw();
   });
   draw();
+
+  // glide the pad onto the anchor once, the way the solver would, then hand it back to the reader
+  let anim = 0;
+  const cancel = () => { cancelAnimationFrame(anim); anim = 0; };
+  pad.addEventListener('pointerdown', cancel); svg.addEventListener('pointerdown', cancel); rot.addEventListener('input', cancel);
+  return {
+    solve() {
+      if (anim || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const a = { ...st }, b = { x: anchor.x + 6, y: SURF - RAD, th: 0 }, t0 = performance.now(), T = 1800;
+      const ease = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+      const step = now => {
+        const k = ease(Math.min(1, (now - t0) / T));
+        st.x = a.x + (b.x - a.x) * k; st.y = a.y + (b.y - a.y) * k; st.th = a.th + (b.th - a.th) * k;
+        draw(); anim = k < 1 ? requestAnimationFrame(step) : 0;
+      };
+      anim = requestAnimationFrame(step);
+    },
+  };
 }

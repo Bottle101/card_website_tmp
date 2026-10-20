@@ -307,13 +307,14 @@ function initWipe() {
     under.src = `assets/img/cut/init/${c}_init.webp`; top.src = `assets/img/cut/init/${c}_card.webp`;
     under.alt = `Geometric initialization on the ${c}`; top.alt = `CARD solution on the ${c}`;
   });
-  // a short sweep the first time it scrolls into view, so it reads as draggable
-  if (!reduced) new IntersectionObserver((es, io) => {
-    if (!es[0].isIntersecting) return; io.disconnect();
+  // a short sweep when its method stage first becomes current, so it reads as draggable
+  let swept = false;
+  w.addEventListener('sweep', () => {
+    if (swept || reduced) return; swept = true;
     const t0 = performance.now();
     const step = now => { const k = Math.min(1, (now - t0) / 1600); const x = 50 + 28 * Math.sin(k * Math.PI * 2) * (1 - k); set(x); input.value = x; if (k < 1) requestAnimationFrame(step); };
     requestAnimationFrame(step);
-  }, { threshold: .6 }).observe(w);
+  });
 }
 
 /* ------------------------------------------------------------------ video to robot (synced 2-up, swappable) */
@@ -453,6 +454,52 @@ async function initPipeline() {
   pick('uhcr');
 }
 
+/* ------------------------------------------------------------------ method: sticky framework, stages light up on scroll */
+function initMethod(anchorDemo) {
+  const fw = $('#fw'), stages = $$('.method-stages .stage[data-stage]'); if (!fw || !stages.length) return;
+  const boxes = $$('.fw-box', fw), narrow = matchMedia('(max-width: 860px)');
+  // on narrow screens the framework is hidden; each stage shows its own box instead
+  stages.forEach(st => {
+    const box = $(`.fw-box[data-stage="${st.dataset.stage}"]`, fw), slot = $('.stage-crop', st);
+    if (box && slot) { const c = box.cloneNode(true); const d = document.createElement('div'); d.className = c.className; d.style.cssText = c.getAttribute('style') || ''; d.innerHTML = c.innerHTML; slot.append(d); }
+  });
+  const once = {
+    3: () => $('#wipe')?.dispatchEvent(new CustomEvent('sweep')),
+    4: () => setTimeout(() => anchorDemo?.solve(), 350),
+  };
+  let cur = null;
+  const setActive = n => {
+    if (n === cur) return; cur = n;
+    fw.classList.add('has-active');
+    boxes.forEach(b => { const on = b.dataset.stage === n; b.classList.toggle('is-active', on); on ? b.setAttribute('aria-current', 'step') : b.removeAttribute('aria-current'); });
+    stages.forEach(st => {
+      const on = st.dataset.stage === n; st.classList.toggle('is-active', on);
+      if (on && !st.classList.contains('seen')) { st.classList.add('seen'); once[n]?.(); }
+      $$('video.stagevid', st).forEach(v => {
+        const shown = v.closest('[data-panel]') ? v.closest('[data-panel]').classList.contains('on') : true;
+        if (on && shown && !reduced) { ensureSrc(v); v.play().catch(() => {}); } else v.pause();
+      });
+    });
+  };
+  const io = new IntersectionObserver(es => {
+    es.forEach(e => { e.target._in = e.isIntersecting; });
+    let act = null; stages.forEach(st => { if (st._in) act = st.dataset.stage; });
+    if (act) setActive(act);
+  }, { rootMargin: '-40% 0px -52% 0px', threshold: 0 });
+  stages.forEach(st => io.observe(st));
+  boxes.forEach(b => b.addEventListener('click', () => {
+    const st = $(`#stage-${b.dataset.stage}`); if (!st) return;
+    const y = $('h3', st).getBoundingClientRect().top + scrollY - 58 - 22;
+    scrollTo({ top: Math.max(0, y), behavior: reduced ? 'auto' : 'smooth' });
+  }));
+  // a stage that is already on screen when it loads (or on narrow screens) counts as seen
+  const seenIO = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting && narrow.matches && !e.target.classList.contains('seen')) { e.target.classList.add('seen'); once[e.target.dataset.stage]?.(); }
+  }), { threshold: .25 });
+  stages.forEach(st => seenIO.observe(st));
+  if (reduced) stages.forEach(st => st.classList.add('seen'));
+}
+
 /* ------------------------------------------------------------------ boot */
 if (matchMedia('(max-width: 600px)').matches) $$('details.fallback-table').forEach(d => { d.open = true; });
 renderMath();
@@ -473,5 +520,5 @@ initMore();
 initEmbodiments();
 initBib();
 initPipeline();
-initAnchorDemo($('#anchor-demo'));
+initMethod(initAnchorDemo($('#anchor-demo')));
 glassify();
