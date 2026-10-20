@@ -49,7 +49,7 @@
   <nav class="hero-nav" aria-label="Primary">
     <a class="wordmark" href="#top" aria-label="CARD, back to top"><svg aria-hidden="true"><use href="#i-card"/></svg>CARD</a>
     <div class="hero-nav-links">
-      <a href="#idea">Idea</a><a href="#sources">Sources</a><a href="#method">Method</a><a href="#vidhaco">Vid-HACO</a><a href="#results">Results</a><a href="#hardware">Hardware</a><a href="#embodiments">Embodiments</a><a href="#cite">Cite</a>
+      <a href="#idea">Idea</a><a href="#method">Method</a><a href="#sources">Sources</a><a href="#vidhaco">Vid-HACO</a><a href="#results">Results</a><a href="#hardware">Hardware</a><a href="#embodiments">Embodiments</a><a href="#cite">Cite</a>
     </div>
   </nav>
   <div class="hero-content">
@@ -81,7 +81,7 @@
   <div class="wrap">
     <a class="wordmark" href="#top"><svg aria-hidden="true"><use href="#i-card"/></svg>CARD</a>
     <nav aria-label="Sections">
-      <a href="#idea">Idea</a><a href="#sources">Sources</a><a href="#method">Method</a><a href="#vidhaco">Vid-HACO</a><a href="#results">Results</a><a href="#hardware">Hardware</a><a href="#embodiments">Embodiments</a><a href="#cite">Cite</a>
+      <a href="#idea">Idea</a><a href="#method">Method</a><a href="#sources">Sources</a><a href="#vidhaco">Vid-HACO</a><a href="#results">Results</a><a href="#hardware">Hardware</a><a href="#embodiments">Embodiments</a><a href="#cite">Cite</a>
     </nav>
   </div>
 </div>
@@ -126,67 +126,6 @@
   </div>
 </section>
 
-<div class="bleed l2d" aria-hidden="true"></div>
-
-<!-- ============================================================ sources -->
-<section class="sec dark" id="sources">
-  <div class="wrap">
-    <h2 class="reveal">Video, glove and motion capture become the same thing</h2>
-    <p class="lead reveal">The three sources measure different signals. CARD reduces each one to a MANO hand mesh over time (MANO is the standard parametric model of the human hand), a fixed set of hand regions (three per finger, plus the palm) shared by every source and every robot, and at most one contact anchor per region and frame. One set of solver weights then serves all three sources.</p>
-
-    <div class="controls reveal">
-      <div class="seg glass" role="group" aria-label="Demonstration source" data-tabs="src">
-        <span class="seg-thumb"></span>
-        <button type="button" aria-pressed="true" data-tab="video">Phone video</button>
-        <button type="button" aria-pressed="false" data-tab="glove">Tactile glove</button>
-        <button type="button" aria-pressed="false" data-tab="mocap">Motion capture</button>
-      </div>
-    </div>
-    <div class="panel-set reveal" data-panels="src">
-      <div data-panel="video" class="on">
-        <div class="src-layout">
-          <div class="media-card src-main">
-            <video muted loop playsinline preload="none" class="inview" data-src="assets/video/drive/vision_contact_cube_pick.mp4" poster="assets/video/drive/vision_contact_cube_pick.jpg" aria-label="Phone video of a hand picking up a Rubik's cube, with the predicted contact drawn on a MANO hand"></video>
-            <div class="tags br"><span class="glass-tag ours">Vid-HACO contact</span></div>
-          </div>
-          <div class="src-side">
-            <p class="txt">HaWoR tracks the hand in world frame and Vid-HACO, our video contact model, marks which of the 778 MANO vertices touch the object. Video measures no force, so forces come from a whole-clip balance step: the smallest smooth correction that drives each grasp's net wrench toward zero. 47 of the 67 clips we recorded are phone videos.</p>
-            <div class="tiles" data-tiles="video"></div>
-          </div>
-        </div>
-      </div>
-      <div data-panel="glove">
-        <div class="src-layout">
-          <div class="media-card src-main">
-            <img src="assets/img/slides/glove_cop_apple.jpg" alt="A hand in a black tactile glove holding an apple, beside a render of the per-finger centers of pressure" loading="lazy">
-            <div class="tags br"><span class="glass-tag plain">Measured pressure</span></div>
-          </div>
-          <div class="src-side">
-            <p class="txt">A 744-taxel pressure grid gives contact and pressure directly, each taxel registered to a personalized MANO mesh, and a wrist tracker gives the hand motion. Each region's center of pressure and force come from the taxel readings, and its push direction from the pressure-weighted surface normals. Glove clips are where contact is best measured, and where CARD keeps the most of it: 89% of anchor-frames.</p>
-            <div class="tiles" data-tiles="glove"></div>
-          </div>
-        </div>
-      </div>
-      <div data-panel="mocap">
-        <div class="src-layout">
-          <div class="media-card src-main pair">
-            <img src="assets/img/cut/gallery/mocap_power_frame.webp" alt="Motion capture: tracked hand and scanned bottle in a power grasp" loading="lazy">
-            <img src="assets/img/cut/gallery/mocap_power_contact.webp" alt="The same frame's contact on the MANO hand from the glove taxels" loading="lazy">
-            <div class="tags br"><span class="glass-tag plain">Tracked hand and object</span></div>
-          </div>
-          <div class="src-side">
-            <p class="txt">An OptiTrack-rigged hand wearing the same glove adds drift-free wrist motion and a tracked object mesh. Public datasets with annotated hands and objects, such as GRAB, enter through their own annotations; the 100 GRAB clips are where CARD is compared with ReGrind, which needs the object mesh.</p>
-            <div class="tiles" data-tiles="mocap"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <p class="cap reveal">Hover or tap a tile to see the contact on the MANO hand. Video contact is binary per vertex; glove and motion-capture contact is the taxel reading.</p>
-  </div>
-</section>
-
-<div class="bleed d2l" aria-hidden="true"></div>
-
 <!-- ============================================================ method: five stages, framework left, illustration right -->
 <section class="sec light" id="method">
   <div class="wrap">
@@ -198,10 +137,10 @@
         <div class="fw" id="fw">
           <button class="fw-box" type="button" data-stage="1" style="--stage: var(--s1)" aria-label="Go to stage 1, human demonstration">
             <span class="fw-head"><span class="stage-mark">1</span>Human demonstration</span>
-            <span class="fw-row fw-icons">
-              <span class="fw-icon"><svg aria-hidden="true"><use href="#i-src-video"/></svg><i>phone video</i></span>
-              <span class="fw-icon"><svg aria-hidden="true"><use href="#i-src-glove"/></svg><i>tactile glove</i></span>
-              <span class="fw-icon"><svg aria-hidden="true"><use href="#i-src-mocap"/></svg><i>motion capture</i></span>
+            <span class="fw-row">
+              <span class="fw-img cover"><img src="assets/img/cut/gallery/video_drill_frame.webp" alt="" loading="lazy"><i>video</i></span>
+              <span class="fw-img cover"><img src="assets/img/cut/pipeline/source_input.webp" alt="" loading="lazy"><i>glove</i></span>
+              <span class="fw-img"><img src="assets/img/cut/gallery/mocap_power_frame.webp" alt="" loading="lazy"><i>mocap</i></span>
             </span>
           </button>
           <span class="fw-arrow" aria-hidden="true"></span>
@@ -258,7 +197,7 @@
             <div class="src-icon"><svg aria-hidden="true"><use href="#i-src-glove"/></svg><b>Tactile glove</b><span>contact and pressure measured by taxels</span></div>
             <div class="src-icon"><svg aria-hidden="true"><use href="#i-src-mocap"/></svg><b>Motion capture</b><span>drift-free wrist, glove contact, tracked object</span></div>
           </div>
-          <p class="cap">Recorded examples of each source are in <a href="#sources">the section above</a>.</p>
+          <p class="cap">Recorded examples of each source follow in <a href="#sources">the next section</a>.</p>
         </article>
 
         <!-- stage 2 -->
@@ -418,6 +357,63 @@
 </section>
 
 <div class="bleed l2d" aria-hidden="true"></div>
+
+<!-- ============================================================ sources -->
+<section class="sec dark" id="sources">
+  <div class="wrap">
+    <h2 class="reveal">Video, glove and motion capture become the same thing</h2>
+    <p class="lead reveal">The three sources measure different signals, and each one below ends up as the same MANO hand mesh sequence with at most one contact anchor per hand region (stage 2 above). One set of solver weights then serves all three sources.</p>
+
+    <div class="controls reveal">
+      <div class="seg glass" role="group" aria-label="Demonstration source" data-tabs="src">
+        <span class="seg-thumb"></span>
+        <button type="button" aria-pressed="true" data-tab="video">Phone video</button>
+        <button type="button" aria-pressed="false" data-tab="glove">Tactile glove</button>
+        <button type="button" aria-pressed="false" data-tab="mocap">Motion capture</button>
+      </div>
+    </div>
+    <div class="panel-set reveal" data-panels="src">
+      <div data-panel="video" class="on">
+        <div class="src-layout">
+          <div class="media-card src-main">
+            <video muted loop playsinline preload="none" class="inview" data-src="assets/video/drive/vision_contact_cube_pick.mp4" poster="assets/video/drive/vision_contact_cube_pick.jpg" aria-label="Phone video of a hand picking up a Rubik's cube, with the predicted contact drawn on a MANO hand"></video>
+            <div class="tags br"><span class="glass-tag ours">Vid-HACO contact</span></div>
+          </div>
+          <div class="src-side">
+            <p class="txt">HaWoR tracks the hand in world frame and Vid-HACO, our video contact model, marks which of the 778 MANO vertices touch the object. Video measures no force, so forces come from a whole-clip balance step: the smallest smooth correction that drives each grasp's net wrench toward zero. 47 of the 67 clips we recorded are phone videos.</p>
+            <div class="tiles" data-tiles="video"></div>
+          </div>
+        </div>
+      </div>
+      <div data-panel="glove">
+        <div class="src-layout">
+          <div class="media-card src-main">
+            <img src="assets/img/slides/glove_cop_apple.jpg" alt="A hand in a black tactile glove holding an apple, beside a render of the per-finger centers of pressure" loading="lazy">
+            <div class="tags br"><span class="glass-tag plain">Measured pressure</span></div>
+          </div>
+          <div class="src-side">
+            <p class="txt">A 744-taxel pressure grid gives contact and pressure directly, each taxel registered to a personalized MANO mesh, and a wrist tracker gives the hand motion. Each region's center of pressure and force come from the taxel readings, and its push direction from the pressure-weighted surface normals. Glove clips are where contact is best measured, and where CARD keeps the most of it: 89% of anchor-frames.</p>
+            <div class="tiles" data-tiles="glove"></div>
+          </div>
+        </div>
+      </div>
+      <div data-panel="mocap">
+        <div class="src-layout">
+          <div class="media-card src-main pair">
+            <img src="assets/img/cut/gallery/mocap_power_frame.webp" alt="Motion capture: tracked hand and scanned bottle in a power grasp" loading="lazy">
+            <img src="assets/img/cut/gallery/mocap_power_contact.webp" alt="The same frame's contact on the MANO hand from the glove taxels" loading="lazy">
+            <div class="tags br"><span class="glass-tag plain">Tracked hand and object</span></div>
+          </div>
+          <div class="src-side">
+            <p class="txt">An OptiTrack-rigged hand wearing the same glove adds drift-free wrist motion and a tracked object mesh. Public datasets with annotated hands and objects, such as GRAB, enter through their own annotations; the 100 GRAB clips are where CARD is compared with ReGrind, which needs the object mesh.</p>
+            <div class="tiles" data-tiles="mocap"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="cap reveal">Hover or tap a tile to see the contact on the MANO hand. Video contact is binary per vertex; glove and motion-capture contact is the taxel reading.</p>
+  </div>
+</section>
 
 <!-- ============================================================ Vid-HACO -->
 <section class="sec dark" id="vidhaco">
