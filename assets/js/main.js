@@ -1,7 +1,7 @@
 // CARD project page. Plain ES modules, no build step.
 import { glassify, initSeg } from './liquid-glass.js';
 import { initAnchorDemo } from './anchor.js';
-import { TASKS, MORE, HANDS, TILES, FIDELITY, HERO_SEGMENTS, V2R_AR } from './data.js';
+import { TASKS, HANDS, TILES, FIDELITY, HERO_SEGMENTS, V2R_AR } from './data.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -374,21 +374,6 @@ function initOnOff() {
   });
 }
 
-/* ------------------------------------------------------------------ more replays */
-function initMore() {
-  const nav = $('#more-nav'), v = $('#more-video'); if (!nav) return;
-  nav.innerHTML = MORE.map((m, i) => `<button type="button" aria-pressed="${i === 0}" data-i="${i}"><img src="${m.poster}" alt="" loading="lazy">${m.name}</button>`).join('');
-  const pick = (i, play = true) => {
-    const m = MORE[i]; $$('button', nav).forEach(b => b.setAttribute('aria-pressed', +b.dataset.i === i));
-    if (play) v.poster = m.poster; else { v.removeAttribute('poster'); v.dataset.poster = m.poster; }
-    v.dataset.src = m.video; v.setAttribute('aria-label', m.name); $('#more-tag').textContent = m.tag;
-    if (play) { ensureSrc(v); if (!reduced) v.play().catch(() => {}); }
-  };
-  nav.addEventListener('click', e => { const b = e.target.closest('button'); if (b) pick(+b.dataset.i); });
-  pick(0, false);
-  inview.observe(v);
-}
-
 /* ------------------------------------------------------------------ embodiments */
 function initEmbodiments() {
   const emb = $('#emb'); if (!emb) return;
@@ -516,7 +501,6 @@ initWipe();
 initV2R();
 initHardware();
 initOnOff();
-initMore();
 initEmbodiments();
 initBib();
 initPipeline();

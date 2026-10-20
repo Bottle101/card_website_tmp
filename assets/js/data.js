@@ -24,16 +24,6 @@ export const TASKS = [
     desc: 'An articulated tool held in a three-finger hand: the tongs are squeezed shut and opened again.' },
 ];
 
-export const MORE = [
-  { name: 'Wiping with an eraser', tag: 'From a tactile glove', video: `${V}drive/realrobot_glove_wipe_eraser.mp4`, poster: `${V}drive/realrobot_glove_wipe_eraser.jpg` },
-  { name: 'Drill power grasp', tag: 'From video', video: `${V}drive/realrobot_vision_drill_grasp_sbs.mp4`, poster: `${V}drive/realrobot_vision_drill_grasp_sbs.jpg` },
-  { name: "Rubik's cube in the fingertips", tag: 'From video', video: `${V}drive/realrobot_vision_rubiks_cube_sbs.mp4`, poster: `${V}drive/realrobot_vision_rubiks_cube_sbs.jpg` },
-  { name: 'Pouring from a cup', tag: 'From video', video: `${V}drive/realrobot_vision_pour_cup.mp4`, poster: `${V}drive/realrobot_vision_pour_cup.jpg` },
-  { name: 'Spray bottle grasp', tag: 'Source not recorded', video: `${V}realworld/windex_sharpa.mp4`, poster: `${V}realworld/windex_sharpa.jpg` },
-  { name: 'Mustard lift and turn', tag: 'Source not recorded', video: `${V}far/sharpa_mustard_grasp_lift_c0291.mp4`, poster: `${V}far/sharpa_mustard_grasp_lift_c0291.jpg` },
-  { name: 'Tracking 1 N per finger', tag: 'Early tactile tracker test', video: `${V}drive/realrobot_tactile_tracking_barrel.mp4`, poster: `${V}drive/realrobot_tactile_tracking_barrel.jpg` },
-];
-
 export const HANDS = {
   sharpa: { name: 'SHARPA Wave', map: `${C}semantic/sharpa.webp`, real: { video: `${V}realworld/cube_crop.mp4`, label: "Rubik's cube pick-up" },
     note: '22 joints, five fingers with three links each. The 15 finger regions and the palm map one-to-one onto same-named links, and the pinky base onto the pinky metacarpal.' },

@@ -374,17 +374,6 @@ h3 { font-size: clamp(21px, 2vw, 26px); line-height: 1.2; font-weight: 700; lett
 .onoff .media-card { aspect-ratio: 4 / 3; }
 .onoff .media-card img, .onoff .media-card video { object-fit: cover; }
 
-/* carousel of further replays */
-.more { margin-top: 26px; max-width: 960px; }
-.more-stage { aspect-ratio: 16 / 9; }
-.more-stage video { object-fit: contain; }
-.more-nav { display: flex; gap: 8px; margin-top: 12px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
-.more-nav::-webkit-scrollbar { display: none; }
-.more-nav button { flex: none; width: 128px; border: 0; padding: 0; background: none; cursor: pointer; text-align: left; color: var(--dink3); font-size: 12.5px; }
-.more-nav button img { width: 128px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 10px; opacity: .55; margin-bottom: 6px; transition: opacity .25s, box-shadow .25s; }
-.more-nav button[aria-pressed="true"] { color: var(--dink); }
-.more-nav button[aria-pressed="true"] img { opacity: 1; box-shadow: 0 0 0 2px var(--ours-lt); }
-
 /* ---------------------------------------------------------------- method */
 .pipe { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 22px; margin-top: 34px; align-items: start; }
 .pipe-fig { position: relative; border-radius: var(--r); overflow: hidden; background: #fff; box-shadow: inset 0 0 0 1px rgba(0,0,0,.07); }
