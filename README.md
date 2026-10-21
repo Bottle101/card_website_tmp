@@ -23,6 +23,8 @@ To publish, push the contents of this folder to a GitHub Pages branch (or any st
 | `assets/js/data.js` | Tables that drive the interactive parts: hardware tasks and the paper-frame timestamps, extra replays, robot hands, gallery tiles, result sentences, hero montage labels |
 | `assets/js/anchor.js` | The draggable contact-anchor / friction-cone demo |
 | `assets/js/liquid-glass.js` | Chromium-only edge refraction for small glass controls |
+| `assets/js/scene3d.js` | Interactive sim scenes (three.js from the CDN via the import map): drag to rotate, scroll to zoom, linked human/robot viewers |
+| `assets/3d/` | The paper's sim panels as GLB meshes plus `scenes/<section>/*.json` (object, hand, anchors, the paper panel's view). Exported on the workstation from the figure scripts' own geometry by `_work/scripts/scene3d/export_web3d.py` and `web3d_bridge.py` (outputs in `output/web3d/` there); `_work/scripts/scene3d/build_scenes.py` writes the scene files; `SCENES` in `data.js` switches a clip from its paper render to 3D |
 | `assets/video/hero/` | Hero montage: card deck, Rubik's cube and Wuji mustard grasp at about 8 s each, then tongs, marker and cup (34 s; `_work/scripts/hero_montage.py` builds it) |
 | `assets/video/realworld/` | The six hardware tasks of the paper's real-world figure, cut from the original Figma videos |
 | `assets/video/charts/` | Result charts rendered as short clips (`_work/charts/` has the generator) |

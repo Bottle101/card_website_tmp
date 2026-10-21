@@ -14,10 +14,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
-<link rel="preload" as="image" href="assets/video/hero/hero.jpg?v=20261021b" fetchpriority="high">
-<link rel="stylesheet" href="assets/css/site.css?v=20261021b">
+<link rel="preload" as="image" href="assets/video/hero/hero.jpg?v=20261021c" fetchpriority="high">
+<link rel="stylesheet" href="assets/css/site.css?v=20261021c">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
-<script type="module" src="assets/js/main.js?v=20261021b"></script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<script type="module" src="assets/js/main.js?v=20261021c"></script>
 </head>
 <body>
 <a class="skip" href="#idea">Skip to content</a>
@@ -43,8 +44,8 @@
 <!-- ============================================================ hero -->
 <header class="hero" id="top">
   <div class="hero-media" aria-hidden="true">
-    <img class="hero-poster" src="assets/video/hero/hero.jpg?v=20261021b" width="1920" height="1080" alt="">
-    <video id="hero-video" muted loop playsinline preload="none" data-video="assets/video/hero/hero.mp4?v=20261021b" tabindex="-1"></video>
+    <img class="hero-poster" src="assets/video/hero/hero.jpg?v=20261021c" width="1920" height="1080" alt="">
+    <video id="hero-video" muted loop playsinline preload="none" data-video="assets/video/hero/hero.mp4?v=20261021c" tabindex="-1"></video>
   </div>
   <div class="hero-shade"></div>
   <nav class="hero-nav" aria-label="Primary">
@@ -214,6 +215,7 @@
             <div class="af-img"><img src="assets/img/cut/pipeline/unified_hand.webp" alt="MANO hand with colored hand regions and one anchor arrow per region" loading="lazy"><i>regions and anchors</i></div>
             <div class="af-img"><img src="assets/img/cut/pipeline/unified_closeup.webp" alt="Close-up of the thumb tip with its contact anchor C_f" loading="lazy"><i>thumb-tip anchor</i></div>
           </figure>
+          <button type="button" class="btn-3d" data-scenes="pipeline/raw_contact:Glove contact map" data-title="Contact on the MANO hand from the glove taxels"><svg aria-hidden="true"><use href="#i-hand"/></svg>Raw contact map in 3D</button>
         </article>
 
         <!-- stage 3 -->
@@ -243,6 +245,7 @@
             <span class="side l">Geometric init</span><span class="side r">After stage 4</span>
             <input type="range" min="0" max="100" value="50" step="0.1" aria-label="Wipe between geometric initialization and the CARD solution">
           </div>
+          <button type="button" class="btn-3d" data-scenes="pipeline/geominit_hand:Hand,pipeline/geominit_closeup:Thumb close-up" data-title="Geometric initialization, Rubik's cube demonstration"><svg aria-hidden="true"><use href="#i-hand"/></svg>Overview-figure initialization in 3D</button>
         </article>
 
         <!-- stage 4 -->
@@ -311,6 +314,7 @@
               <input id="ad-rot" type="range" min="-80" max="80" step="1" value="0">
             </div>
           </div>
+          <button type="button" class="btn-3d" data-scenes="pipeline/retarget_hand:Hand,pipeline/retarget_closeup:Friction cone" data-title="After stage 4, Rubik's cube demonstration"><svg aria-hidden="true"><use href="#i-hand"/></svg>Overview-figure solution in 3D</button>
         </article>
 
         <!-- stage 5 -->

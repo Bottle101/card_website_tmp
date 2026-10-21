@@ -316,6 +316,20 @@ h3 { font-size: clamp(21px, 2vw, 26px); line-height: 1.2; font-weight: 700; lett
 .tile img.contact { opacity: 0; background: #f2f2f2; object-fit: contain; }
 .tile:hover img.contact, .tile:focus-visible img.contact, .tile.flip img.contact { opacity: 1; }
 .tile .glass-tag { position: absolute; left: 6px; bottom: 6px; font-size: 11px; padding: .3em .7em; }
+.tile .glass-tag.t3d { left: auto; right: 6px; top: 6px; bottom: auto; opacity: 0; transition: opacity .3s; }
+.tile.has3d:hover .t3d, .tile.has3d:focus-visible .t3d, .tile.has3d.flip .t3d { opacity: 1; }
+/* the shared 3D dialog */
+.s3d-dialog { width: min(680px, 92vw); padding: 0; border: 0; border-radius: 22px; background: #f7f7f7; color: var(--ink); box-shadow: 0 30px 80px rgba(0,0,0,.35); overflow: hidden; }
+.s3d-dialog::backdrop { background: rgba(14,14,16,.55); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.s3d-dialog-head { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px 0 18px; font-size: 15px; }
+.s3d-views { display: flex; gap: 6px; margin-left: auto; margin-right: 10px; }
+.s3d-views button { border: 0; border-radius: 999px; padding: 5px 11px; font: 600 12.5px/1 inherit; background: rgba(0,0,0,.06); color: var(--ink2); cursor: pointer; }
+.s3d-views button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.s3d-close { width: 32px; height: 32px; border: 0; border-radius: 50%; background: rgba(0,0,0,.06); font-size: 20px; line-height: 1; cursor: pointer; color: var(--ink); }
+.s3d-dialog-stage { aspect-ratio: 1; }
+.btn-3d { display: inline-flex; align-items: center; gap: 7px; margin-top: 14px; padding: 7px 14px 7px 11px; border: 0; border-radius: 999px; background: rgba(0,0,0,.055); color: var(--ink); font: 600 13.5px/1 inherit; cursor: pointer; transition: background .2s; }
+.btn-3d:hover { background: rgba(0,0,0,.1); }
+.btn-3d svg { width: 15px; height: 15px; }
 .panel-set > [data-panel] { display: none; }
 .panel-set > [data-panel].on { display: block; animation: fadeup .45s var(--ease); }
 @keyframes fadeup { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
@@ -386,6 +400,29 @@ h3 { font-size: clamp(21px, 2vw, 26px); line-height: 1.2; font-weight: 700; lett
 .of-bar s { position: absolute; top: 0; bottom: 0; background: var(--fail); }
 .of-bar i { position: absolute; z-index: 1; top: -2px; bottom: 0; left: 0; width: 2px; margin-left: -1px; background: #fff; box-shadow: 0 0 4px rgba(0,0,0,.5); }
 
+/* interactive sim scenes (assets/js/scene3d.js): the paper render stays in flow as the poster and fallback */
+.s3d { position: relative; touch-action: pan-y; }
+.s3d > img { transition: opacity .4s var(--ease); }
+.s3d.s3d-ready > img { opacity: 0 !important; }
+.s3d-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; opacity: 0; transition: opacity .4s var(--ease); }
+.s3d-ready .s3d-canvas { opacity: 1; }
+.s3d-canvas:active { cursor: grabbing; }
+.s3d > .lbl, .s3d > .glass-tag, .s3d > i { z-index: 4; }
+.s3d-map .s3d-half { position: absolute; top: 0; bottom: 0; width: 50%; }
+.s3d-map .s3d-half.l { left: 0; } .s3d-map .s3d-half.r { right: 0; }
+.s3d-map:has(.s3d-ready) > img { opacity: 0 !important; }
+.s3d-ui { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.s3d-hint { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); padding: 3px 10px; border-radius: 999px; background: rgba(255,255,255,.82); box-shadow: 0 1px 3px rgba(0,0,0,.08); font-size: 12px; color: var(--ink2); white-space: nowrap; opacity: 0; transition: opacity .3s; }
+.s3d-ready:hover .s3d-hint { opacity: 1; }
+.s3d-reset { position: absolute; right: 8px; top: 8px; display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 50%; background: rgba(255,255,255,.88); box-shadow: 0 1px 4px rgba(0,0,0,.14); color: var(--ink); cursor: pointer; pointer-events: auto; opacity: 0; visibility: hidden; transition: opacity .25s; }
+.s3d-reset svg { width: 14px; height: 14px; }
+.s3d-label { position: absolute; left: 0; top: 0; font: italic 500 15px/1.1 var(--serif, Georgia, serif); color: #d0571c; white-space: nowrap; text-shadow: 0 0 3px #fff, 0 0 6px #fff; pointer-events: none; }
+.s3d-used .s3d-reset { opacity: 1; visibility: visible; }
+.s3d-used .s3d-hint { opacity: 0 !important; }
+.s3d-sub .s3d-hint, .s3d-live .s3d-hint { display: none; }
+.wipe.w3d .s3d-hint { top: auto; bottom: 12px; left: auto; right: 12px; transform: none; }   /* inside the CARD side, clear of the bar */
+@media (pointer: coarse) { .s3d-ready:not(.s3d-live) .s3d-hint { opacity: 1; } }
+
 /* ---------------------------------------------------------------- method */
 .pipe { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 22px; margin-top: 34px; align-items: start; }
 .pipe-fig { position: relative; border-radius: var(--r); overflow: hidden; background: #fff; box-shadow: inset 0 0 0 1px rgba(0,0,0,.07); }
@@ -422,6 +459,13 @@ h3 { font-size: clamp(21px, 2vw, 26px); line-height: 1.2; font-weight: 700; lett
 .wipe .side.r { right: 12px; color: var(--ours-ink); }
 .wipe:has(input:focus-visible) .knob { outline: 2px solid var(--ours); outline-offset: 2px; }
 .wipe input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: ew-resize; margin: 0; }
+/* 3D wipe: only the bar moves the wipe (the stage turns the view); the range input stays for the keyboard */
+.wipe.w3d { cursor: auto; }
+.wipe.w3d input { pointer-events: none; }
+.wipe.w3d .bar { z-index: 5; pointer-events: auto; cursor: ew-resize; touch-action: none; }
+.wipe.w3d .bar::before { content: ""; position: absolute; top: 0; bottom: 0; left: -14px; right: -14px; }
+.wipe.w3d .side { z-index: 5; }
+.wipe.w3d .s3d-reset { top: auto; bottom: 10px; }
 
 /* ---------------------------------------------------------------- charts as short clips */
 .chart-card { position: relative; border-radius: var(--r); background: var(--paper); overflow: hidden; box-shadow: inset 0 0 0 1px rgba(0,0,0,.06); }

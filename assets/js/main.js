@@ -1,7 +1,8 @@
 // CARD project page. Plain ES modules, no build step.
-import { glassify, initSeg } from './liquid-glass.js?v=20261021b';
-import { initAnchorDemo } from './anchor.js?v=20261021b';
-import { TASKS, HANDS, TILES, FIDELITY, HERO_SEGMENTS, V2R_AR } from './data.js?v=20261021b';
+import { glassify, initSeg } from './liquid-glass.js?v=20261021c';
+import { initAnchorDemo } from './anchor.js?v=20261021c';
+import { TASKS, HANDS, TILES, FIDELITY, HERO_SEGMENTS, V2R_AR, SCENES } from './data.js?v=20261021c';
+import { createViewer, pairViewers } from './scene3d.js?v=20261021c';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -228,6 +229,58 @@ function segs() {
 }
 const pressed = seg => $('button[aria-pressed="true"]', seg);
 
+/* ------------------------------------------------------------------ 3D scenes */
+const S3D = 'assets/3d/scenes/';
+// a human panel and its robot panel as two viewers sharing one viewpoint, made when the card nears the viewport
+// (each viewer holds a WebGL context); the paper renders underneath stay as posters and fallback
+function scenePair(card, human, robot, labels, first) {
+  human.classList.add('s3d'); robot.classList.add('s3d');
+  new IntersectionObserver((es, io) => {
+    if (!es[0].isIntersecting) return; io.disconnect();
+    const hv = createViewer(human, { label: labels[0], reset: false }), rv = createViewer(robot, { label: labels[1] });
+    pairViewers(hv, rv); card._rv = rv;
+    hv.show(first[0]); rv.show(card._next || first[1]);
+  }, { rootMargin: '600px 0px' }).observe(card);
+}
+// switch the robot panel, keeping the reader's viewpoint
+function sceneSwap(card, url) { card._next = url; if (card._rv) card._rv.show(url, { keepView: true }); }
+// small renders (the source tiles) open in one shared dialog, so the page holds a single extra WebGL context
+// views: [{ name, url, on }] (the one marked `on`, else the first, opens); chips in the header switch views, keeping the viewpoint
+let sceneDialog = null;
+function openScene(views, title) {
+  if (!sceneDialog) {
+    const d = document.createElement('dialog'); d.className = 's3d-dialog';
+    d.innerHTML = '<div class="s3d-dialog-head"><b></b><span class="s3d-views"></span><button type="button" class="s3d-close" aria-label="Close">&times;</button></div><div class="s3d-dialog-stage s3d"></div>';
+    document.body.appendChild(d);
+    d.addEventListener('click', e => { if (e.target === d) d.close(); });
+    $('.s3d-close', d).addEventListener('click', () => d.close());
+    sceneDialog = { d, v: createViewer($('.s3d-dialog-stage', d), { label: `${title}, 3D: drag to rotate` }) };
+  }
+  const { d, v } = sceneDialog, chips = $('.s3d-views', d);
+  $('b', d).textContent = title;
+  const first = Math.max(0, views.findIndex(w => w.on));
+  chips.innerHTML = views.length > 1 ? views.map((w, i) => `<button type="button" aria-pressed="${i === first}">${w.name}</button>`).join('') : '';
+  $$('button', chips).forEach((b, i) => b.addEventListener('click', () => {
+    $$('button', chips).forEach(o => o.setAttribute('aria-pressed', o === b)); v.show(views[i].url, { keepView: true });
+  }));
+  d.showModal(); v.show(views[first].url);
+}
+
+// stage 2's two renders as viewers; "View in 3D" buttons (data-scenes="path:name,...") open the dialog
+function initPipeline3d() {
+  $$('.anchor-fig .af-img').forEach(box => {
+    const img = $('img', box), key = img.getAttribute('src').split('/').pop().replace(/\.webp$/, '');
+    if (!SCENES.pipeline.includes(key)) return;
+    box.classList.add('s3d');
+    new IntersectionObserver((es, io) => {
+      if (!es[0].isIntersecting) return; io.disconnect();
+      createViewer(box, { label: `${img.alt}, 3D: drag to rotate` }).show(`${S3D}pipeline/${key}.json`);
+    }, { rootMargin: '600px 0px' }).observe(box);
+  });
+  $$('[data-scenes]').forEach(b => b.addEventListener('click', () => openScene(
+    b.dataset.scenes.split(',').map(x => { const [path, name] = x.split(':'); return { name, url: `${S3D}${path}.json` }; }), b.dataset.title)));
+}
+
 /* ------------------------------------------------------------------ baselines viewer */
 const METHOD_NAMES = { card: 'CARD', dexpilot: 'DexPilot', anyteleopk: 'AnyTeleop-K', fingertipik: 'Fingertip IK', init: 'Geometric initialization' };
 const METHOD_NOTES = {
@@ -244,6 +297,9 @@ function initBaselines() {
     holder.innerHTML = Object.keys(METHOD_NAMES).map((m, i) =>
       `<img class="${i === 0 ? 'base on' : ''}" data-m="${m}" src="assets/img/cut/baselines/${clip}_${m}.webp" alt="${METHOD_NAMES[m]} on the ${clip}" loading="lazy">`).join('')
       + `<span class="lbl glass-tag ours m-tag">CARD</span>`;
+    if (SCENES.baselines.includes(clip))
+      scenePair(card, $('.human', card), holder, [`Human demonstration on the ${clip}, 3D: drag to rotate`, `Robot retargeting on the ${clip}, 3D: drag to rotate`],
+        [`${S3D}baselines/${clip}_human.json`, `${S3D}baselines/${clip}_card.json`]);
   });
   $('#base-ctl .seg').addEventListener('pick', e => {
     const m = e.detail.dataset.m;
@@ -251,6 +307,7 @@ function initBaselines() {
       $$('.robot img', card).forEach(img => img.classList.toggle('on', img.dataset.m === m));
       const tag = $('.m-tag', card); tag.textContent = METHOD_NAMES[m]; tag.className = `lbl glass-tag m-tag ${m === 'card' ? 'ours' : 'kin'}`;
       $('.m-name', card).textContent = METHOD_NAMES[m];
+      if (SCENES.baselines.includes(card.dataset.clip)) sceneSwap(card, `${S3D}baselines/${card.dataset.clip}_${m}.json`);
     });
     $('#base-cap').textContent = METHOD_NOTES[m];
   });
@@ -271,7 +328,19 @@ function initSources() {
     box.innerHTML = list.map(t => `<button class="tile" type="button" aria-label="${t.label}: show contact">
       <img src="${t.frame}" alt="${t.label}, source frame" loading="lazy"><img class="contact" src="${t.contact}" alt="${t.label}, contact on the MANO hand" loading="lazy">
       <span class="glass-tag plain">${t.label}</span></button>`).join('');
-    $$('.tile', box).forEach(b => b.addEventListener('click', () => b.classList.toggle('flip')));
+    $$('.tile', box).forEach((b, i) => {
+      const key = list[i].contact.split('/').pop().replace(/_contact\.webp$/, '');
+      if (!SCENES.gallery.includes(key)) { b.addEventListener('click', () => b.classList.toggle('flip')); return; }
+      // with a 3D scene: hover (or a first tap) shows the contact, a click opens it in 3D
+      b.classList.add('has3d'); b.setAttribute('aria-label', `${list[i].label}: contact on the hand, open in 3D`);
+      b.insertAdjacentHTML('beforeend', '<span class="glass-tag plain t3d">3D</span>');
+      b.addEventListener('click', () => {
+        const views = (SCENES.galleryFrames.includes(key) ? [{ name: 'Hand and object', url: `${S3D}gallery/${key}_frame.json` }] : [])
+          .concat({ name: 'Contact', url: `${S3D}gallery/${key}.json`, on: true });
+        if (matchMedia('(hover: hover)').matches || b.classList.contains('flip')) openScene(views, list[i].label);
+        else b.classList.add('flip');
+      });
+    });
   });
 }
 
@@ -305,12 +374,32 @@ function initWipe() {
   const w = $('#wipe'); if (!w) return;
   const input = $('input', w), under = $('img.under', w), top = $('.top img', w);
   const set = x => w.style.setProperty('--x', `${x}%`);
+  const at = e => { const r = w.getBoundingClientRect(); const x = Math.min(100, Math.max(0, (e.clientX - r.left) / r.width * 100)); input.value = x; set(x); };
+  let clip = pressed($('#wipe-ctl')).dataset.c, show3d = null;
   input.addEventListener('input', () => set(input.value));
-  w.addEventListener('pointermove', e => { if (e.pointerType === 'mouse' && e.buttons === 0) return; const r = w.getBoundingClientRect(); const x = (e.clientX - r.left) / r.width * 100; input.value = x; set(x); });
+  if (SCENES.init.includes(clip)) {
+    // 3D: two linked viewers, CARD's clipped by the wipe; the bar drags the wipe, the rest of the stage turns the view
+    const base = document.createElement('div'); under.replaceWith(base); base.appendChild(under);
+    const topBox = $('.top', w), bar = $('.bar', w);
+    base.classList.add('s3d'); topBox.classList.add('s3d'); w.classList.add('w3d');
+    let vu = null, vt = null;
+    show3d = c => { if (vu) { vu.show(`${S3D}init/${c}_init.json`); vt.show(`${S3D}init/${c}_card.json`); } };
+    new IntersectionObserver((es, io) => {
+      if (!es[0].isIntersecting) return; io.disconnect();
+      vu = createViewer(base, { label: 'Geometric initialization, 3D: drag to rotate', reset: false });
+      vt = createViewer(topBox, { label: 'CARD solution, 3D: drag to rotate' });
+      pairViewers(vu, vt); show3d(clip);
+    }, { rootMargin: '600px 0px' }).observe(w);
+    bar.addEventListener('pointerdown', e => { bar.setPointerCapture(e.pointerId); at(e); e.preventDefault(); });
+    bar.addEventListener('pointermove', e => { if (bar.hasPointerCapture(e.pointerId)) at(e); });
+  } else {
+    w.addEventListener('pointermove', e => { if (e.pointerType === 'mouse' && e.buttons === 0) return; at(e); });
+  }
   $('#wipe-ctl').addEventListener('pick', e => {
-    const c = e.detail.dataset.c;
+    const c = clip = e.detail.dataset.c;
     under.src = `assets/img/cut/init/${c}_init.webp`; top.src = `assets/img/cut/init/${c}_card.webp`;
     under.alt = `Geometric initialization on the ${c}`; top.alt = `CARD solution on the ${c}`;
+    if (show3d) show3d(c);
   });
   // a short sweep when its method stage first becomes current, so it reads as draggable
   let swept = false;
@@ -457,14 +546,36 @@ function initEmbodiments() {
     const d = card.dataset.demo;
     $('[data-role="human"]', card).src = `assets/img/cut/crossemb/${d}_human.webp`;
     $('[data-role="robot"]', card).innerHTML = keys.map((h, i) => `<img class="${i === 0 ? 'on' : ''}" data-h="${h}" src="assets/img/cut/crossemb/${d}_${h}.webp" alt="${HANDS[h].name} retargeted grasp on the ${d}" loading="lazy">`).join('');
+    if (SCENES.crossemb.includes(d)) {
+      const img = $('[data-role="human"]', card), wrap = document.createElement('div');
+      img.replaceWith(wrap); wrap.appendChild(img);
+      scenePair(card, wrap, $('[data-role="robot"]', card), [`Human source grasp on the ${d}, 3D: drag to rotate`, `Retargeted grasp on the ${d}, 3D: drag to rotate`],
+        [`${S3D}crossemb/${d}_human.json`, `${S3D}crossemb/${d}_${keys[0]}.json`]);
+    }
   });
   $('#emb-map').innerHTML = keys.map((h, i) => `<img class="${i === 0 ? 'on' : ''}" data-h="${h}" src="${HANDS[h].map}" alt="Semantic map from human hand regions to ${HANDS[h].name}" loading="lazy">`).join('');
   const real = $('#emb-real');
+  // semantic maps in 3D: the human regions and the robot regions as two linked viewers over the map image
+  let showMap = null;
+  if (SCENES.semantic.length) {
+    const map = $('#emb-map'), hBox = document.createElement('div'), rBox = document.createElement('div');
+    hBox.className = 's3d s3d-half l'; rBox.className = 's3d s3d-half r'; map.classList.add('s3d-map'); map.append(hBox, rBox);
+    let hv = null, rv = null, cur = keys[0];
+    showMap = h => { cur = h; if (hv && SCENES.semantic.includes(h)) { hv.show(`${S3D}semantic/${h}_human.json`); rv.show(`${S3D}semantic/${h}_robot.json`); } };
+    new IntersectionObserver((es, io) => {
+      if (!es[0].isIntersecting) return; io.disconnect();
+      hv = createViewer(hBox, { label: 'Human hand regions, 3D: drag to rotate', reset: false });
+      rv = createViewer(rBox, { label: 'Robot hand regions, 3D: drag to rotate' });
+      pairViewers(hv, rv); showMap(cur);
+    }, { rootMargin: '600px 0px' }).observe(map);
+  }
   const pick = h => {
     const H = HANDS[h];
     $$('[data-h]', emb).forEach(img => img.classList.toggle('on', img.dataset.h === h));
+    $$('.emb-card', emb).forEach(card => { if (SCENES.crossemb.includes(card.dataset.demo)) sceneSwap(card, `${S3D}crossemb/${card.dataset.demo}_${h}.json`); });
     $$('.h-name', emb).forEach(c => { c.textContent = H.name; });
     $$('#emb-map img').forEach(img => img.classList.toggle('on', img.dataset.h === h));
+    if (showMap) showMap(h);
     $('#emb-note').innerHTML = H.note;
     const old = $('video', real); if (old) old.pause();
     real.innerHTML = H.real
@@ -570,6 +681,7 @@ initNav();
 initReveal();
 initSynced();
 initBaselines();
+initPipeline3d();
 initSources();
 initCharts();
 initWipe();
