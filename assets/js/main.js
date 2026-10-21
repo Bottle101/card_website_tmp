@@ -1,8 +1,8 @@
 // CARD project page. Plain ES modules, no build step.
-import { glassify, initSeg } from './liquid-glass.js?v=20261021d';
-import { initAnchorDemo } from './anchor.js?v=20261021d';
-import { TASKS, HANDS, TILES, FIDELITY, HERO_SEGMENTS, V2R_AR, SCENES } from './data.js?v=20261021d';
-import { createViewer, pairViewers } from './scene3d.js?v=20261021d';
+import { glassify, initSeg } from './liquid-glass.js?v=20261021e';
+import { initAnchorDemo } from './anchor.js?v=20261021e';
+import { TASKS, HANDS, TILES, FIDELITY, HERO_SEGMENTS, V2R_AR, SCENES } from './data.js?v=20261021e';
+import { createViewer, pairViewers } from './scene3d.js?v=20261021e';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -368,8 +368,14 @@ function initSources() {
       // with a 3D scene: hover (or a first tap) shows the contact, a click opens it in 3D
       b.classList.add('has3d'); b.setAttribute('aria-label', `${list[i].label}: contact on the hand, open in 3D`);
       b.insertAdjacentHTML('beforeend', '<span class="glass-tag plain t3d">3D</span>');
-      b.addEventListener('click', () => {
-        const views = (SCENES.galleryFrames.includes(key) ? [{ name: 'Hand and object', url: `${S3D}gallery/${key}_frame.json` }] : [])
+      // the tile's sim renders as compact viewers (contact on hover; mocap's hand + object as the face): drag turns in place
+      const frame = SCENES.galleryFrames.includes(key);
+      const mk = (cls, url) => { const d = document.createElement('div'); d.className = `s3d s3d-tile ${cls}`; b.prepend(d); return () => createViewer(d, { compact: true, label: `${list[i].label}, 3D` }).show(url); };
+      const later = [mk('contact', `${S3D}gallery/${key}.json`)].concat(frame ? [mk('frame', `${S3D}gallery/${key}_frame.json`)] : []);
+      new IntersectionObserver((es, io) => { if (!es[0].isIntersecting || !b.clientWidth) return; io.disconnect(); later.forEach(f => f()); }, { rootMargin: '300px 0px' }).observe(b);
+      b.addEventListener('click', e => {
+        if (e.target.closest('[data-dragged]')) return;
+        const views = (frame ? [{ name: 'Hand and object', url: `${S3D}gallery/${key}_frame.json` }] : [])
           .concat({ name: 'Contact', url: `${S3D}gallery/${key}.json`, on: true });
         if (matchMedia('(hover: hover)').matches || b.classList.contains('flip')) openScene(views, list[i].label);
         else b.classList.add('flip');
