@@ -45,13 +45,16 @@ function sharedRenderer(L) {
   return shared = { renderer, env, w: 0, h: 0 };
 }
 
-export function createViewer(el, { label = 'Interactive 3D scene', reset = true } = {}) {
+// compact: a thumbnail (no hint, reset or labels). A drag sets data-dragged on el until the click it ends in has passed,
+// so a viewer inside a button can rotate without triggering it.
+export function createViewer(el, { label = 'Interactive 3D scene', reset = true, compact = false } = {}) {
   let L, cv, ctx, scene, camera, controls, root, pending = 0, mats = {}, home = null, shown = null, peers = [], syncing = false, tags = [], exposure = 1;
   const ui = document.createElement('div'); ui.className = 's3d-ui';
   ui.innerHTML = `<span class="s3d-hint">${coarse ? 'Tap, then drag to turn' : 'Drag to rotate · scroll to zoom'}</span>`
     + '<button type="button" class="s3d-reset" aria-label="Reset the view" title="Reset the view"><svg aria-hidden="true"><use href="#i-replay"/></svg></button>';
   const $reset = ui.querySelector('.s3d-reset');
-  if (!reset) { $reset.remove(); el.classList.add('s3d-sub'); }   // linked viewers keep one reset and hint, on the main panel
+  if (!reset || compact) { $reset.remove(); el.classList.add('s3d-sub'); }   // linked viewers keep one reset and hint, on the main panel
+
   const ready = three().then(lib3 => {
     L = lib3; const { THREE } = L;
     const { env } = sharedRenderer(L);
@@ -67,6 +70,12 @@ export function createViewer(el, { label = 'Interactive 3D scene', reset = true 
     controls.enableDamping = true; controls.dampingFactor = .12; controls.rotateSpeed = .8; controls.zoomSpeed = .8;
     controls.addEventListener('change', () => { request(); if (!syncing && home) { const st = pose(); peers.forEach(p => p.follow(st)); } });
     controls.addEventListener('start', () => el.classList.add('s3d-used'));
+    let down = null;                                // pointer travel, not camera motion (damping keeps moving after a drag)
+    cv.addEventListener('pointerdown', e => { down = [e.clientX, e.clientY]; });
+    cv.addEventListener('pointerup', e => {
+      if (down && Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 5) { el.dataset.dragged = '1'; setTimeout(() => delete el.dataset.dragged, 0); }
+      down = null;
+    });
     if (coarse) {                                   // let the page scroll over the viewer until it is tapped
       controls.enabled = false; cv.style.touchAction = 'pan-y';
       cv.addEventListener('click', () => { wake(); peers.forEach(p => p.wake()); });
@@ -198,7 +207,7 @@ export function createViewer(el, { label = 'Interactive 3D scene', reset = true 
       if (root) scene.remove(root);
       root = built.g; scene.add(root); exposure = built.exposure;
       tags.forEach(t => t.el.remove());
-      tags = built.labels.map(lb => {
+      tags = (compact ? [] : built.labels).map(lb => {
         const t = document.createElement('span'); t.className = 's3d-label';
         t.innerHTML = lb.html || lb.text.replace(/[<&]/g, c => ({ '<': '&lt;', '&': '&amp;' })[c]).replace(/_(\w+)/, '<sub>$1</sub>');
         if (lb.color) t.style.color = lb.color;

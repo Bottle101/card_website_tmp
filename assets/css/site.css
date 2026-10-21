@@ -411,6 +411,10 @@ h3 { font-size: clamp(21px, 2vw, 26px); line-height: 1.2; font-weight: 700; lett
 .s3d-map .s3d-half { position: absolute; top: 0; bottom: 0; width: 50%; }
 .s3d-map .s3d-half.l { left: 0; } .s3d-map .s3d-half.r { right: 0; }
 .s3d-map:has(.s3d-ready) > img { opacity: 0 !important; }
+.src-main.pair.s3d-map > img { opacity: 1; }
+.src-main.pair .s3d-half { background: #f2f2f2; }
+.src-main.pair:has(.s3d-ready) > img { opacity: 0 !important; }
+.fw-img.s3d > i { z-index: 4; }
 .s3d-ui { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
 .s3d-hint { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); padding: 3px 10px; border-radius: 999px; background: rgba(255,255,255,.82); box-shadow: 0 1px 3px rgba(0,0,0,.08); font-size: 12px; color: var(--ink2); white-space: nowrap; opacity: 0; transition: opacity .3s; }
 .s3d-ready:hover .s3d-hint { opacity: 1; }

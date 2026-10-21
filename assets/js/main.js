@@ -1,8 +1,8 @@
 // CARD project page. Plain ES modules, no build step.
-import { glassify, initSeg } from './liquid-glass.js?v=20261021c';
-import { initAnchorDemo } from './anchor.js?v=20261021c';
-import { TASKS, HANDS, TILES, FIDELITY, HERO_SEGMENTS, V2R_AR, SCENES } from './data.js?v=20261021c';
-import { createViewer, pairViewers } from './scene3d.js?v=20261021c';
+import { glassify, initSeg } from './liquid-glass.js?v=20261021d';
+import { initAnchorDemo } from './anchor.js?v=20261021d';
+import { TASKS, HANDS, TILES, FIDELITY, HERO_SEGMENTS, V2R_AR, SCENES } from './data.js?v=20261021d';
+import { createViewer, pairViewers } from './scene3d.js?v=20261021d';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -281,6 +281,36 @@ function initPipeline3d() {
     b.dataset.scenes.split(',').map(x => { const [path, name] = x.split(':'); return { name, url: `${S3D}${path}.json` }; }), b.dataset.title)));
 }
 
+// the framework's sim thumbnails (and their copies in the stage articles) as compact viewers: drag turns, a click still navigates
+const THUMBS = { mocap_power_frame: 'gallery/mocap_power_frame', raw_contact: 'pipeline/raw_contact', unified_hand: 'pipeline/unified_hand',
+  unified_closeup: 'pipeline/unified_closeup', geominit_hand: 'pipeline/geominit_hand', geominit_closeup: 'pipeline/geominit_closeup',
+  retarget_hand: 'pipeline/retarget_hand', retarget_closeup: 'pipeline/retarget_closeup' };
+function initThumbs3d() {
+  if (!SCENES.thumbs) return;
+  $$('.fw-img').forEach(box => {
+    const img = $('img', box), key = img.getAttribute('src').split('/').pop().replace(/\.webp$/, '');
+    if (!THUMBS[key]) return;
+    box.classList.add('s3d');
+    new IntersectionObserver((es, io) => {
+      if (!es[0].isIntersecting || !box.clientWidth) return; io.disconnect();
+      createViewer(box, { compact: true, label: `${key.replace(/_/g, ' ')}, 3D thumbnail` }).show(`${S3D}${THUMBS[key]}.json`);
+    }, { rootMargin: '400px 0px' }).observe(box);
+  });
+  $$('.fw-box').forEach(b => b.addEventListener('click', e => {
+    if (e.target.closest('[data-dragged]')) { e.preventDefault(); e.stopImmediatePropagation(); }
+  }, true));
+}
+// two side-by-side renders (mocap source + its contact) as linked viewers over the images
+function halves3d(box, urls, labels) {
+  const l = document.createElement('div'), r = document.createElement('div');
+  l.className = 's3d s3d-half l'; r.className = 's3d s3d-half r'; box.classList.add('s3d-map'); box.append(l, r);
+  new IntersectionObserver((es, io) => {
+    if (!es[0].isIntersecting || !box.clientWidth) return; io.disconnect();
+    const a = createViewer(l, { label: labels[0], reset: false }), b = createViewer(r, { label: labels[1] });
+    pairViewers(a, b); a.show(urls[0]); b.show(urls[1]);
+  }, { rootMargin: '400px 0px' }).observe(box);
+}
+
 /* ------------------------------------------------------------------ baselines viewer */
 const METHOD_NAMES = { card: 'CARD', dexpilot: 'DexPilot', anyteleopk: 'AnyTeleop-K', fingertipik: 'Fingertip IK', init: 'Geometric initialization' };
 const METHOD_NOTES = {
@@ -323,6 +353,10 @@ function initSources() {
       $$('video', p).forEach(v => { if (on) { ensureSrc(v); if (!reduced) v.play().catch(() => {}); } else v.pause(); });
     });
   });
+  const pair = $('[data-panel="mocap"] .src-main.pair');
+  if (pair && SCENES.galleryFrames.includes('mocap_power'))
+    halves3d(pair, [`${S3D}gallery/mocap_power_frame.json`, `${S3D}gallery/mocap_power.json`],
+      ['Tracked hand and object, 3D: drag to rotate', 'Contact on the MANO hand, 3D: drag to rotate']);
   $$('[data-tiles]').forEach(box => {
     const list = TILES[box.dataset.tiles] || [];
     box.innerHTML = list.map(t => `<button class="tile" type="button" aria-label="${t.label}: show contact">
@@ -582,6 +616,12 @@ function initEmbodiments() {
       ? `<div class="media-card"><video muted loop playsinline preload="none" data-src="${H.real.video}" data-poster="${H.real.video.replace(/\.mp4$/, '.jpg')}" aria-label="${H.real.label}"></video><div class="tags"><span class="glass-tag ours">${H.name}</span></div><div class="tags br"><span class="glass-tag plain">${H.real.label}</span></div></div>`
       : `<figure class="still" style="margin:0"><img src="assets/img/cut/crossemb/cube_gripper.webp" alt="Parallel-jaw gripper retargeted onto the cube demonstration" loading="lazy"><p>Retargeting only, no hardware replay.</p></figure>`;
     const nv = $('video', real); if (nv) inview.observe(nv);
+    const still = $('.still', real);
+    if (still && SCENES.crossemb.includes('cube')) {         // the gripper has no hardware replay: its cube retarget in 3D
+      const img = $('img', still), wrap = document.createElement('div');
+      wrap.className = 's3d'; img.replaceWith(wrap); wrap.appendChild(img);
+      createViewer(wrap, { label: 'Parallel-jaw gripper on the cube demonstration, 3D: drag to rotate' }).show(`${S3D}crossemb/cube_gripper.json`);
+    }
   };
   $('#emb-ctl').addEventListener('pick', e => pick(e.detail.dataset.h));
   pick('sharpa');
@@ -692,4 +732,5 @@ initEmbodiments();
 initBib();
 initPipeline();
 initMethod(initAnchorDemo($('#anchor-demo')));
+initThumbs3d();
 glassify();

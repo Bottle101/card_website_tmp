@@ -106,7 +106,8 @@ export const SCENES = {
   crossemb: ['hammer', 'cube'],
   init: ['cup', 'hanger', 'can', 'cards', 'marker', 'bowl'],
   semantic: ['sharpa', 'wuji', 'dex3', 'gripper'],
-  pipeline: ['unified_hand', 'unified_closeup'],   // stage 2's figure; the other pipeline scenes open from the stage buttons
+  pipeline: ['unified_hand', 'unified_closeup'],
+  thumbs: true,         // the framework diagram's sim thumbnails   // stage 2's figure; the other pipeline scenes open from the stage buttons
   // <source>_<object>, opened in the shared 3D dialog from the source tiles (mocap tiles also have <key>_frame: hand + object)
   gallery: ['video_drill', 'video_spray', 'video_mallet', 'video_can', 'glove_cup', 'glove_cube', 'glove_mustard', 'glove_eraser',
     'mocap_power', 'mocap_pinch', 'mocap_tripod', 'mocap_top'],
