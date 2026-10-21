@@ -1,12 +1,15 @@
 # CARD project page
 
-Static site, no build step. Open it through a local server (ES modules do not load from `file://`):
+Static site, no build step. Open it through a local server (ES modules do not load from `file://`). From the `CARD_website` folder:
 
 ```
-cd website
-python3 -m http.server 8765
+python3 -I _work/scripts/rangeserver.py website 8765
 # http://localhost:8765/
 ```
+
+It listens on 127.0.0.1 only, answers byte-range requests (Safari needs them for video) and sends `Cache-Control: no-cache`, so a reload picks up edits.
+
+`index.html` and `main.js` load the CSS and JS with a `?v=` tag. Bump it in both files after changing CSS or JS, so browsers that cached an older copy (GitHub Pages caches for 10 minutes) fetch the new one.
 
 To publish, push the contents of this folder to a GitHub Pages branch (or any static host).
 
@@ -20,7 +23,7 @@ To publish, push the contents of this folder to a GitHub Pages branch (or any st
 | `assets/js/data.js` | Tables that drive the interactive parts: hardware tasks and the paper-frame timestamps, extra replays, robot hands, gallery tiles, result sentences, hero montage labels |
 | `assets/js/anchor.js` | The draggable contact-anchor / friction-cone demo |
 | `assets/js/liquid-glass.js` | Chromium-only edge refraction for small glass controls |
-| `assets/video/hero/` | Hero montage (six real-world tasks, 19 s) |
+| `assets/video/hero/` | Hero montage: card deck, Rubik's cube and Wuji mustard grasp at about 8 s each, then tongs, marker and cup (34 s; `_work/scripts/hero_montage.py` builds it) |
 | `assets/video/realworld/` | The six hardware tasks of the paper's real-world figure, cut from the original Figma videos |
 | `assets/video/charts/` | Result charts rendered as short clips (`_work/charts/` has the generator) |
 | `assets/video/drive/`, `far/`, `v2r/` | Clips from the group-meeting slides, the `far_intern` folder, and the video-to-robot renders |

@@ -1,7 +1,7 @@
 // CARD project page. Plain ES modules, no build step.
-import { glassify, initSeg } from './liquid-glass.js';
-import { initAnchorDemo } from './anchor.js';
-import { TASKS, HANDS, TILES, FIDELITY, HERO_SEGMENTS, V2R_AR } from './data.js';
+import { glassify, initSeg } from './liquid-glass.js?v=20261021b';
+import { initAnchorDemo } from './anchor.js?v=20261021b';
+import { TASKS, HANDS, TILES, FIDELITY, HERO_SEGMENTS, V2R_AR } from './data.js?v=20261021b';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -71,7 +71,12 @@ function initHero() {
     } else v.pause();
   };
   v.addEventListener('playing', () => v.classList.add('is-playing'));
-  v.addEventListener('error', () => { btn.hidden = true; });
+  // a fetch that dies before any data arrives (seen at page load on HTTP/1 servers) gets one more try
+  let retried = false;
+  v.addEventListener('error', () => {
+    if (attached && !retried) { retried = true; v.src = v.dataset.video; sync(); return; }
+    btn.hidden = true;
+  });
   btn.addEventListener('click', () => {
     userPaused = !userPaused; if (!userPaused) asked = true; btn.classList.toggle('paused', userPaused);
     btn.setAttribute('aria-label', userPaused ? 'Play background video' : 'Pause background video');
@@ -226,11 +231,11 @@ const pressed = seg => $('button[aria-pressed="true"]', seg);
 /* ------------------------------------------------------------------ baselines viewer */
 const METHOD_NAMES = { card: 'CARD', dexpilot: 'DexPilot', anyteleopk: 'AnyTeleop-K', fingertipik: 'Fingertip IK', init: 'Geometric initialization' };
 const METHOD_NOTES = {
-  card: 'Two video clips retargeted to the SHARPA Wave. Orange spheres are the contact anchors taken from the human hand; the object is drawn only for reference.',
-  dexpilot: 'DexPilot matches fingertip vectors. It reaches the object but not the contact.',
-  anyteleopk: 'AnyTeleop with its key-vector objective. It also reaches the object but not the contact.',
-  fingertipik: 'Inverse kinematics on fingertip positions, shown in the paper\'s figure but not in the results table. The pads miss the anchors.',
-  init: 'CARD stopped after its closed-form initializer: closer than every kinematic baseline, but the last millimeters are missing.',
+  card: 'Retargeted to the SHARPA Wave. Orange spheres are the human contact anchors.',
+  dexpilot: 'DexPilot matches fingertip vectors and misses the contact.',
+  anyteleopk: 'AnyTeleop with key vectors also misses the contact.',
+  fingertipik: 'IK on fingertip positions (not in the results table). The pads miss the anchors.',
+  init: 'CARD\'s initializer alone: closer than the baselines, but short of the anchors.',
 };
 function initBaselines() {
   const root = $('#baselines'); if (!root) return;
@@ -359,19 +364,89 @@ function initHardware() {
 }
 
 /* ------------------------------------------------------------------ tracker on/off */
+// Paired clips (assets/video/tactile, cut by _work/scripts/tactile_pairs.py); the hammer has only the paper's stills.
+// fail: [from s, to s, what goes wrong] in the clip without the tracker, read off the footage frame by frame.
+const ONOFF = {
+  cards: { noun: 'card deck', res: ['Card picked up', 'No card lifted'], fail: [[5.3, 99, 'The pinch closes on air: the top card stays on the deck']] },
+  mustard: { noun: 'mustard bottle', res: ['Dispensed', 'Nothing comes out'], fail: [[9, 15.6, 'Bottle held over the glass but not squeezed: no mustard comes out']] },
+  wipe: { noun: 'whiteboard', res: ['Erased', 'Ink stays'], fail: [[13.5, 17.5, 'The eraser passes over the ink without pressing it off'], [24, 99, 'Ink still on the board']] },
+  hammer: { noun: 'hammer', res: ['Held', 'Slipped'], still: true, fail: [[0, 99, 'The hammer slips out of the grasp']] },
+  cup: { noun: 'cup', res: ['Held', 'Slipped'], fail: [[4.8, 9.8, 'The cup slips and tilts in the grasp']] },
+};
 function initOnOff() {
   const box = $('#onoff'); if (!box) return;
-  const RES = { hammer: ['Held', 'Slipped'], cup: ['Held', 'Slipped'], mustard: ['Dispensed', 'Nothing comes out'] };
-  const NOUN = { hammer: 'hammer', cup: 'cup', mustard: 'mustard bottle' };
-  $('#onoff-ctl').addEventListener('pick', e => {
-    const t = e.detail.dataset.t;
-    ['on', 'off'].forEach((s, k) => {
-      const card = $(`[data-side="${s}"]`, box), img = $('img', card);
-      img.src = `assets/img/cut/tactile/${t}_${s}.webp`;
-      img.alt = s === 'on' ? `With the tactile tracker: ${NOUN[t]}, ${RES[t][0].toLowerCase()}` : `Position replay only: ${NOUN[t]}, ${RES[t][1].toLowerCase()}`;
-      $('.res', card).textContent = RES[t][k];
+  const cards = ['on', 'off'].map(s => $(`[data-side="${s}"]`, box));
+  const offCard = cards[1], callTxt = $('.fail-call .txt', offCard);
+  let vids = [], fail = [], visible = false, timer = 0, raf = 0;
+  // timeline under each clip, with the failure spans in red on the clip without the tracker
+  const spans = (card, v, f) => {
+    const bar = $('.of-bar', card); $$('s', bar).forEach(e => e.remove());
+    const d = v.duration; if (!d) return;
+    f.forEach(([a, b]) => { const e = document.createElement('s'); e.style.left = `${a / d * 100}%`; e.style.width = `${(Math.min(b, d) - a) / d * 100}%`; bar.appendChild(e); });
+  };
+  const mark = () => {
+    vids.forEach((v, k) => {
+      const card = cards[k], d = v.duration || 0, x = d ? Math.min(1, v.currentTime / d) : 0;
+      $('.of-bar b', card).style.transform = `scaleX(${x})`; $('.of-bar i', card).style.left = `${x * 100}%`;
+      if (k !== 1) return;
+      const ev = fail.find(([a, b]) => v.currentTime >= a && v.currentTime < b);
+      offCard.classList.toggle('failing', !!ev);
+      if (ev) callTxt.textContent = ev[2];
     });
-  });
+  };
+  const loop = () => { mark(); raf = requestAnimationFrame(loop); };
+  const playAll = () => {
+    if (reduced || !visible) return;
+    vids.forEach(v => { ensureSrc(v); v.play().catch(() => {}); });
+    if (vids.length && !raf) raf = requestAnimationFrame(loop);
+  };
+  const pauseAll = () => { vids.forEach(v => v.pause()); cancelAnimationFrame(raf); raf = 0; };
+  // the shorter clip holds its last frame; both restart together once both have ended
+  const ended = () => {
+    if (!vids.length || !vids.every(v => v.ended)) return;
+    clearTimeout(timer);
+    timer = setTimeout(() => { vids.forEach(v => { v.currentTime = 0; }); playAll(); }, 1200);
+  };
+  function show(t) {
+    const d = ONOFF[t]; if (!d) return;
+    clearTimeout(timer); pauseAll(); vids = []; fail = d.fail;
+    cards.forEach((card, k) => {
+      const s = k ? 'off' : 'on';
+      const what = k ? ` ${d.fail.map(f => f[2]).join('; ')}.` : '';
+      const label = (k ? `Position replay only: ${d.noun}, ${d.res[1].toLowerCase()}.` : `With the tactile tracker: ${d.noun}, ${d.res[0].toLowerCase()}.`) + what;
+      let el;
+      if (d.still) {
+        el = document.createElement('img');
+        el.src = `assets/img/cut/tactile/${t}_${s}.webp`; el.alt = label;
+      } else {
+        el = document.createElement('video');
+        el.muted = true; el.playsInline = true; el.preload = 'none';
+        el.setAttribute('muted', ''); el.setAttribute('playsinline', '');
+        el.poster = `assets/video/tactile/${t}_${s}.jpg`;
+        el.dataset.src = `assets/video/tactile/${t}_${s}.mp4`;
+        el.setAttribute('aria-label', label);
+        el.addEventListener('ended', ended);
+        el.addEventListener('loadedmetadata', () => { spans(card, el, k ? d.fail : []); mark(); });
+        el.addEventListener('seeked', mark);
+        vids.push(el);
+      }
+      card.firstElementChild.replaceWith(el);
+      $('.res', card).textContent = d.res[k];
+      $('.of-bar', card).hidden = !!d.still; $$('.of-bar s', card).forEach(e => e.remove());
+    });
+    // a still, or no motion: name the failure without waiting for the frame
+    const fixed = d.still || reduced;
+    offCard.classList.toggle('failing', fixed);
+    callTxt.textContent = fixed ? d.fail[0][2] : '';
+    if (!fixed) mark();
+    playAll();
+  }
+  new IntersectionObserver(es => {
+    visible = es[0].isIntersecting && es[0].intersectionRatio >= .3;
+    if (visible) playAll(); else pauseAll();
+  }, { threshold: [0, .3, .6] }).observe(box);
+  $('#onoff-ctl').addEventListener('pick', e => show(e.detail.dataset.t));
+  show(pressed($('#onoff-ctl')).dataset.t);
 }
 
 /* ------------------------------------------------------------------ embodiments */
@@ -394,7 +469,7 @@ function initEmbodiments() {
     const old = $('video', real); if (old) old.pause();
     real.innerHTML = H.real
       ? `<div class="media-card"><video muted loop playsinline preload="none" data-src="${H.real.video}" data-poster="${H.real.video.replace(/\.mp4$/, '.jpg')}" aria-label="${H.real.label}"></video><div class="tags"><span class="glass-tag ours">${H.name}</span></div><div class="tags br"><span class="glass-tag plain">${H.real.label}</span></div></div>`
-      : `<figure class="still" style="margin:0"><img src="assets/img/cut/crossemb/cube_gripper.webp" alt="Parallel-jaw gripper retargeted onto the cube demonstration" loading="lazy"><p>No hardware replay for the gripper; its results are retargeting only.</p></figure>`;
+      : `<figure class="still" style="margin:0"><img src="assets/img/cut/crossemb/cube_gripper.webp" alt="Parallel-jaw gripper retargeted onto the cube demonstration" loading="lazy"><p>Retargeting only, no hardware replay.</p></figure>`;
     const nv = $('video', real); if (nv) inview.observe(nv);
   };
   $('#emb-ctl').addEventListener('pick', e => pick(e.detail.dataset.h));

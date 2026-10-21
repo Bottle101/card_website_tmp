@@ -1,12 +1,24 @@
 // One contact anchor, one robot pad. The cost is the paper's contact group without the anti-slip term:
 // reach ||s* - c||^2 plus friction cone lambda r^2 (1 - n(s*) . d), lambda = 2, r = 10 mm, in mm^2.
-// The pad is a capsule: a flat palmar face between two rounded ends; s* is its closest point to the anchor.
+// The pad is a robot fingertip's distal link, a capsule: a flat palmar face (the tactile pad) between two
+// rounded ends; s* is its closest point to the anchor. The middle link behind the joint only collides with the surface.
 const PX_PER_MM = 7, HALF = 44, RAD = 26, SURF = 262, LAMBDA = 2, R_MM = 10;
+const LINK = [[80, -18], [80, 18]].map(([u, v]) => {          // where the middle link fades out, pad frame (see index.html)
+  const a = -38 * Math.PI / 180;
+  return [50 + u * Math.cos(a) - v * Math.sin(a), -6 + u * Math.sin(a) + v * Math.cos(a)];
+});
+const TAXELS = Array.from({ length: 15 }, (_, i) => -56 + 8 * i);   // x of the pad's taxel row, pad frame
 
 export function initAnchorDemo(root) {
   if (!root) return;
   const $ = id => root.querySelector(`#${id}`);
   const svg = root.querySelector('svg'), pad = $('ad-pad'), rot = $('ad-rot');
+  const NS = 'http://www.w3.org/2000/svg', taxG = $('ad-tax');
+  const lit = TAXELS.map(x => {
+    const dot = (r, fill) => { const c = document.createElementNS(NS, 'circle'); c.setAttribute('cx', x); c.setAttribute('cy', 19.5); c.setAttribute('r', r); c.setAttribute('fill', fill); taxG.appendChild(c); return c; };
+    dot(1.8, 'rgba(255,255,255,.24)');
+    return dot(2.8, '#ff9d4d');
+  });
   const anchor = { x: 320, y: SURF };
   const st = { x: 404, y: 196, th: 18 };
 
@@ -19,8 +31,9 @@ export function initAnchorDemo(root) {
   const lab = $('ad-anchor-l'); lab.setAttribute('x', anchor.x - 30); lab.setAttribute('y', anchor.y + 26);
   lab.innerHTML = 'c<tspan font-size="10" dy="3">f</tspan><tspan dx="16" dy="-3" fill="#b25616">push d̂</tspan>';
 
-  const lowestY = (y, th) => y + HALF * Math.abs(Math.sin(th)) + RAD;
-  const clamp = () => {                              // the pad may touch the surface but not sink into it
+  const lowestY = (y, th) => Math.max(y + HALF * Math.abs(Math.sin(th)) + RAD,
+    ...LINK.map(([px, py]) => y + Math.sin(th) * px + Math.cos(th) * py));
+  const clamp = () => {                              // the finger may touch the surface but not sink into it
     const th = st.th * Math.PI / 180;
     const over = lowestY(st.y, th) - (SURF + 1);
     if (over > 0) st.y -= over;
@@ -46,7 +59,7 @@ export function initAnchorDemo(root) {
     const wx = st.x + c * px - s * py, wy = st.y + s * px + c * py;
     const wnx = c * nx - s * ny, wny = s * nx + c * ny;
     const tilt = Math.acos(Math.max(-1, Math.min(1, wny))) * 180 / Math.PI;   // push direction is +y
-    return { gap: gapPx / PX_PER_MM, tilt, wx, wy, palmar };
+    return { gap: gapPx / PX_PER_MM, tilt, wx, wy, palmar, lx: px };
   }
 
   function draw() {
@@ -68,6 +81,8 @@ export function initAnchorDemo(root) {
       ? `A ${Math.round(r.tilt)}° tilt costs as much as a <b>${eq.toFixed(1)} mm</b> miss. Total <b>${(reach + cone).toFixed(0)} mm²</b>.`
       : `The pad faces the push. Total <b>${(reach + cone).toFixed(0)} mm²</b>, all of it reach.`;
     const est = r.palmar && r.gap <= 2, inc = est && r.tilt <= 45;
+    // taxels light up around s* while the pad is in contact
+    lit.forEach((c, i) => c.setAttribute('opacity', est ? Math.exp(-((TAXELS[i] - r.lx) ** 2) / 162).toFixed(3) : 0));
     $('ad-c1').classList.toggle('ok', est); $('ad-c2').classList.toggle('ok', inc);
     $('ad-c1').textContent = est ? 'Contact established' : (r.palmar ? 'No contact: more than 2 mm away' : 'No contact: wrong face of the pad');
     $('ad-c2').textContent = inc ? 'Inside the 45° cone' : (est ? 'Outside the cone' : 'Not scored: no contact');

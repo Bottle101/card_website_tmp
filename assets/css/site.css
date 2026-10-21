@@ -231,7 +231,7 @@ h3 { font-size: clamp(21px, 2vw, 26px); line-height: 1.2; font-weight: 700; lett
 .hero-actions .btn { color: #fff; background: linear-gradient(180deg, rgba(255,255,255,.15), rgba(255,255,255,.06)); box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 6px 22px rgba(0,0,0,.28); }
 .hero-actions .btn[aria-disabled="true"] { opacity: .62; }
 .hero-bottom { position: absolute; left: 0; right: 0; bottom: 28px; display: flex; justify-content: space-between; align-items: center; gap: 16px; }
-.scroll-cue { display: inline-flex; align-items: center; gap: 12px; font-size: 12.5px; color: rgba(236,236,238,.7); text-decoration: none; }
+.scroll-cue { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; gap: 12px; font-size: 12.5px; color: rgba(236,236,238,.7); text-decoration: none; }
 .scroll-cue span { width: 1px; height: 30px; background: linear-gradient(rgba(255,255,255,0), rgba(255,255,255,.7)); }
 .hero-now { display: flex; align-items: center; gap: 10px; }
 .hero-now .glass-tag { font-size: 12.5px; transition: opacity .3s; }
@@ -373,6 +373,18 @@ h3 { font-size: clamp(21px, 2vw, 26px); line-height: 1.2; font-weight: 700; lett
 .onoff { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 18px; }
 .onoff .media-card { aspect-ratio: 4 / 3; }
 .onoff .media-card img, .onoff .media-card video { object-fit: cover; }
+/* failure labels on the run without the tracker: a callout and a red ring while it fails, red spans on the timeline */
+.onoff .media-card::before { content: ""; position: absolute; inset: 0; z-index: 4; border-radius: inherit; pointer-events: none; box-shadow: inset 0 0 0 3px var(--fail); opacity: 0; transition: opacity .25s; }
+.onoff .media-card.failing::before { opacity: 1; }
+.fail-call { position: absolute; z-index: 6; left: 12px; right: 12px; top: 48px; pointer-events: none; opacity: 0; transform: translateY(-4px); transition: opacity .25s, transform .25s; }
+.failing .fail-call { opacity: 1; transform: none; }
+.fail-call .glass-tag { white-space: normal; --c: #d63f37; }
+.fail-call svg { width: 14px; height: 14px; flex: none; }
+.of-bar { position: absolute; z-index: 6; left: 0; right: 0; bottom: 0; height: 4px; background: rgba(255,255,255,.16); pointer-events: none; }
+.of-bar[hidden] { display: none; }
+.of-bar b { position: absolute; inset: 0; background: rgba(255,255,255,.6); transform-origin: left; transform: scaleX(0); }
+.of-bar s { position: absolute; top: 0; bottom: 0; background: var(--fail); }
+.of-bar i { position: absolute; z-index: 1; top: -2px; bottom: 0; left: 0; width: 2px; margin-left: -1px; background: #fff; box-shadow: 0 0 4px rgba(0,0,0,.5); }
 
 /* ---------------------------------------------------------------- method */
 .pipe { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 22px; margin-top: 34px; align-items: start; }
@@ -543,7 +555,7 @@ h3 { font-size: clamp(21px, 2vw, 26px); line-height: 1.2; font-weight: 700; lett
 .fw-arrow { display: block; height: 16px; text-align: center; line-height: 16px; font-size: 12px; color: var(--ink3); }
 .fw-arrow::before { content: "\2193"; }
 
-.stage { min-height: 72vh; padding: 56px 0; border-top: 1px solid var(--line); }
+.stage { min-height: 56vh; padding: 56px 0; border-top: 1px solid var(--line); }
 .stage:first-child { padding-top: 0; border-top: 0; }
 .stage:last-child { min-height: 0; }
 .stage h3 { display: flex; align-items: baseline; gap: 12px; }
