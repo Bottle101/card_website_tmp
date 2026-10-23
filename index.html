@@ -14,11 +14,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
-<link rel="preload" as="image" href="assets/video/hero/hero.jpg?v=20261021e" fetchpriority="high">
-<link rel="stylesheet" href="assets/css/site.css?v=20261021e">
+<link rel="preload" as="image" href="assets/video/hero/hero.jpg?v=20261022a" fetchpriority="high">
+<link rel="stylesheet" href="assets/css/site.css?v=20261022a">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
-<script type="module" src="assets/js/main.js?v=20261021e"></script>
+<script type="module" src="assets/js/main.js?v=20261022a"></script>
 </head>
 <body>
 <a class="skip" href="#idea">Skip to content</a>
@@ -44,8 +44,8 @@
 <!-- ============================================================ hero -->
 <header class="hero" id="top">
   <div class="hero-media" aria-hidden="true">
-    <img class="hero-poster" src="assets/video/hero/hero.jpg?v=20261021e" width="1920" height="1080" alt="">
-    <video id="hero-video" muted loop playsinline preload="none" data-video="assets/video/hero/hero.mp4?v=20261021e" tabindex="-1"></video>
+    <img class="hero-poster" src="assets/video/hero/hero.jpg?v=20261022a" width="1920" height="1080" alt="">
+    <video id="hero-video" muted loop playsinline preload="none" data-video="assets/video/hero/hero.mp4?v=20261022a" tabindex="-1"></video>
   </div>
   <div class="hero-shade"></div>
   <nav class="hero-nav" aria-label="Primary">
@@ -71,7 +71,7 @@
   <div class="hero-bottom">
     <a class="scroll-cue" href="#idea" aria-label="Scroll to content"><span></span></a>
     <div class="hero-now">
-      <span class="glass-tag plain" id="hero-label" aria-live="off"></span>
+      <button type="button" class="glass-tag plain hero-jump" id="hero-label"></button>
       <button class="hero-toggle glass lg" type="button" aria-controls="hero-video" aria-label="Pause background video" hidden>
         <svg class="i-pause" aria-hidden="true"><use href="#i-pause"/></svg><svg class="i-play" aria-hidden="true"><use href="#i-play"/></svg>
       </button>
@@ -97,34 +97,17 @@
     <h2 class="reveal">A copied hand pose misses the contact</h2>
     <p class="lead reveal">Copying fingertips or joint angles to a robot hand misses the contact by a median 20 to 25&nbsp;mm. CARD keeps where, which way and how hard each hand region pressed (a contact anchor) and puts the matching pad there.</p>
 
-    <div class="controls reveal" id="base-ctl">
-      <span class="label">Method</span>
-      <div class="seg glass light" role="group" aria-label="Retargeting method">
-        <span class="seg-thumb"></span>
-        <button type="button" aria-pressed="true" data-m="card">CARD</button>
-        <button type="button" aria-pressed="false" data-m="dexpilot">DexPilot</button>
-        <button type="button" aria-pressed="false" data-m="anyteleopk">AnyTeleop-K</button>
-        <button type="button" aria-pressed="false" data-m="fingertipik">Fingertip IK</button>
-        <button type="button" aria-pressed="false" data-m="init">Geometric init</button>
-      </div>
-    </div>
     <div class="cmp-grid reveal" id="baselines">
-      <figure class="cmp-card" style="margin:0" data-clip="hanger">
-        <div class="cmp-stage">
-          <div class="human"><img src="assets/img/cut/baselines/hanger_human.webp" alt="Human hand pinching a coat-hanger bar, with orange contact anchors" loading="lazy"><span class="lbl glass-tag human">Human</span></div>
-          <div class="robot"></div>
-        </div>
-        <figcaption class="cmp-foot"><b>Coat hanger</b><span class="m-name">CARD</span></figcaption>
+      <figure class="cmp-case" style="margin:0" data-clip="hanger">
+        <figcaption class="cmp-head"><b>Coat hanger</b><span class="cmp-nav"><button type="button" data-dir="-1" aria-label="Scroll to the previous methods">&lsaquo;</button><button type="button" data-dir="1" aria-label="Scroll to the next methods">&rsaquo;</button></span></figcaption>
+        <div class="cmp-strip" tabindex="0" aria-label="Coat hanger: the human demonstration, then each method"></div>
       </figure>
-      <figure class="cmp-card" style="margin:0" data-clip="cup">
-        <div class="cmp-stage">
-          <div class="human"><img src="assets/img/cut/baselines/cup_human.webp" alt="Human fingers pinching the handle of a mug, with orange contact anchors" loading="lazy"><span class="lbl glass-tag human">Human</span></div>
-          <div class="robot"></div>
-        </div>
-        <figcaption class="cmp-foot"><b>Cup</b><span class="m-name">CARD</span></figcaption>
+      <figure class="cmp-case" style="margin:0" data-clip="cup">
+        <figcaption class="cmp-head"><b>Cup</b><span class="cmp-nav"><button type="button" data-dir="-1" aria-label="Scroll to the previous methods">&lsaquo;</button><button type="button" data-dir="1" aria-label="Scroll to the next methods">&rsaquo;</button></span></figcaption>
+        <div class="cmp-strip" tabindex="0" aria-label="Cup: the human demonstration, then each method"></div>
       </figure>
     </div>
-    <p class="cap reveal" id="base-cap">Retargeted to the SHARPA Wave. Orange spheres are the human contact anchors.</p>
+    <p class="cap reveal" id="base-cap">Retargeted to the SHARPA Wave; orange spheres are the human contact anchors. Scroll sideways for every method; drag any panel to turn the whole row.</p>
   </div>
 </section>
 
@@ -435,20 +418,9 @@
     </div>
     <p class="cap reveal">Clips from an earlier Vid-HACO version.</p>
 
-    <div class="chart-row reveal" style="margin-top:42px">
-      <div>
-        <div class="controls" style="margin-top:0">
-          <div class="seg glass small" role="group" aria-label="Benchmark" data-chart="vidhaco">
-            <span class="seg-thumb"></span>
-            <button type="button" aria-pressed="false" data-v="val">Validation split</button>
-            <button type="button" aria-pressed="true" data-v="hrdexdb">HRDexDB, held out</button>
-          </div>
-        </div>
-        <div class="chart-card"><video class="chart" muted playsinline preload="none" data-rest="end" data-group="vidhaco" data-src="assets/video/charts/vidhaco_hrdexdb.mp4" poster="assets/video/charts/vidhaco_hrdexdb.jpg" aria-label="Bar chart of vertex F1, average precision and frame F1 for HACO, HACO retrained, and Vid-HACO"></video><button class="replay glass light" type="button" aria-label="Replay chart"><svg aria-hidden="true"><use href="#i-replay"/></svg></button></div>
-      </div>
-      <div class="prose" id="vidhaco-text">
-        <p>Retrained on our data, HACO-R gains in distribution (F1 57.1 to 74.5) but not on HRDexDB, so the gain is the model. Both HACO models flag contact on every frame (trivial frame F1 75.9); Vid-HACO reaches 95.3.</p>
-      </div>
+    <div class="chart-pair reveal" style="margin-top:42px">
+      <figure class="chart-card"><figcaption>Validation split</figcaption><video class="chart" muted playsinline preload="none" data-rest="end" data-src="assets/video/charts/vidhaco_val.mp4" poster="assets/video/charts/vidhaco_val.jpg" aria-label="Bar chart of vertex F1, vertex AP and frame F1 on the validation split: Vid-HACO 84.3, 92.4, 98.3; HACO-R 74.5, 70.4, 86.1; HACO 57.1, 51.7, 86.1"></video><button class="replay glass light" type="button" aria-label="Replay chart"><svg aria-hidden="true"><use href="#i-replay"/></svg></button></figure>
+      <figure class="chart-card"><figcaption>HRDexDB, held out</figcaption><video class="chart" muted playsinline preload="none" data-rest="end" data-src="assets/video/charts/vidhaco_hrdexdb.mp4" poster="assets/video/charts/vidhaco_hrdexdb.jpg" aria-label="Bar chart of vertex F1, vertex AP and frame F1 on held-out HRDexDB: Vid-HACO 67.2, 72.2, 95.3; HACO-R 62.6, 54.5, 75.9; HACO 63.3, 54.3, 75.9"></video><button class="replay glass light" type="button" aria-label="Replay chart"><svg aria-hidden="true"><use href="#i-replay"/></svg></button></figure>
     </div>
   </div>
 </section>
@@ -462,11 +434,6 @@
     <p class="lead reveal">167 demonstrations on the SHARPA Wave (our 67 clips, 100 GRAB clips). A contact counts within 2&nbsp;mm of the assigned link's palmar face.</p>
 
     <div class="controls reveal" id="fid-ctl">
-      <div class="seg glass light small" role="group" aria-label="Test bed" data-k="bed">
-        <span class="seg-thumb"></span>
-        <button type="button" aria-pressed="true" data-v="own67">Our 67 clips</button>
-        <button type="button" aria-pressed="false" data-v="grab">GRAB, 100 clips</button>
-      </div>
       <div class="seg glass light small" role="group" aria-label="Metric" data-k="metric">
         <span class="seg-thumb"></span>
         <button type="button" aria-pressed="true" data-v="contact">Contact rate</button>
@@ -476,9 +443,9 @@
         <button type="button" aria-pressed="false" data-v="pen">Penetration</button>
       </div>
     </div>
-    <div class="chart-row reveal">
-      <div class="chart-card"><video class="chart" id="fid-video" muted playsinline preload="none" data-rest="end" data-src="assets/video/charts/fidelity_own67_contact.mp4" poster="assets/video/charts/fidelity_own67_contact.jpg" aria-label="Bar chart of contact fidelity per retargeting method"></video><button class="replay glass light" type="button" aria-label="Replay chart"><svg aria-hidden="true"><use href="#i-replay"/></svg></button></div>
-      <div class="prose" aria-live="polite"><p id="fid-text"></p></div>
+    <div class="chart-pair reveal" id="fid-pair">
+      <figure class="chart-card" data-bed="own67"><figcaption>Our 67 clips</figcaption><video class="chart" muted playsinline preload="none" data-rest="end" data-src="assets/video/charts/fidelity_own67_contact.mp4" poster="assets/video/charts/fidelity_own67_contact.jpg" aria-label="Contact rate per retargeting method on our 67 clips"></video><p class="chart-na" hidden>Not measured on our clips: video and glove demonstrations have no object mesh.</p><button class="replay glass light" type="button" aria-label="Replay chart"><svg aria-hidden="true"><use href="#i-replay"/></svg></button></figure>
+      <figure class="chart-card" data-bed="grab"><figcaption>GRAB, 100 clips</figcaption><video class="chart" muted playsinline preload="none" data-rest="end" data-src="assets/video/charts/fidelity_grab_contact.mp4" poster="assets/video/charts/fidelity_grab_contact.jpg" aria-label="Contact rate per retargeting method on 100 GRAB clips"></video><button class="replay glass light" type="button" aria-label="Replay chart"><svg aria-hidden="true"><use href="#i-replay"/></svg></button></figure>
     </div>
     <details class="fallback-table reveal">
       <summary>Show the full table</summary>

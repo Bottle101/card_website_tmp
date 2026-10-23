@@ -235,6 +235,9 @@ h3 { font-size: clamp(21px, 2vw, 26px); line-height: 1.2; font-weight: 700; lett
 .scroll-cue span { width: 1px; height: 30px; background: linear-gradient(rgba(255,255,255,0), rgba(255,255,255,.7)); }
 .hero-now { display: flex; align-items: center; gap: 10px; }
 .hero-now .glass-tag { font-size: 12.5px; transition: opacity .3s; }
+.hero-jump { border: 0; font-family: inherit; cursor: pointer; }
+.hero-jump::after { content: "\2192"; margin-left: .15em; opacity: .7; transition: transform .2s; }
+.hero-jump:hover::after { transform: translateX(2px); }
 .hero-toggle { width: 38px; height: 38px; padding: 0; border: 0; display: grid; place-items: center; cursor: pointer; color: #fff; }
 .hero-toggle svg { width: 14px; height: 14px; }
 .hero-toggle .i-play { display: none; }
@@ -263,18 +266,22 @@ h3 { font-size: clamp(21px, 2vw, 26px); line-height: 1.2; font-weight: 700; lett
 .topnav nav a.active { color: var(--ink); background: rgba(255,255,255,.85); box-shadow: 0 1px 2px rgba(0,0,0,.06), inset 0 0 0 1px rgba(0,0,0,.05); }
 
 /* ---------------------------------------------------------------- baselines viewer */
-.cmp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
-.cmp-card { display: flex; flex-direction: column; border-radius: var(--r); background: #fff; box-shadow: inset 0 0 0 1px rgba(0,0,0,.07); overflow: hidden; }
-.cmp-stage { position: relative; display: grid; grid-template-columns: 34% 66%; align-items: center; background: #f7f7f7; }
-.cmp-stage .human, .cmp-stage .robot { position: relative; }
-.cmp-stage .robot { overflow: hidden; }
-.cmp-stage img { width: 100%; height: auto; }
-.cmp-stage .robot img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0; transition: opacity .35s var(--ease); }
-.cmp-stage .robot img.base { position: relative; height: auto; opacity: 0; }
-.cmp-stage .robot img.on { opacity: 1; }
-.cmp-stage .lbl { position: absolute; left: 10px; bottom: 10px; }
-.cmp-foot { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 12px 16px 14px; font-size: 14px; color: var(--ink2); border-top: 1px solid var(--line); }
-.cmp-foot b { color: var(--ink); font-weight: 600; }
+.cmp-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+/* one case per column: the human demonstration, CARD, then each baseline, scrolled sideways */
+.cmp-case { border-radius: var(--r); background: #fff; box-shadow: inset 0 0 0 1px rgba(0,0,0,.07); overflow: hidden; }
+.cmp-head { display: flex; justify-content: space-between; align-items: center; padding: 12px 12px 10px 16px; font-size: 15px; }
+.cmp-head b { font-weight: 600; }
+.cmp-nav { display: flex; gap: 6px; }
+.cmp-nav button { width: 30px; height: 30px; border: 0; border-radius: 50%; background: rgba(0,0,0,.06); color: var(--ink); font-size: 20px; line-height: 1; cursor: pointer; transition: opacity .2s, background .2s; }
+.cmp-nav button:hover { background: rgba(0,0,0,.11); }
+.cmp-nav button:disabled { opacity: .3; cursor: default; }
+.cmp-strip { display: flex; gap: 10px; padding: 0 12px 12px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 12px; scrollbar-width: thin; overscroll-behavior-x: contain; }
+.cmp-strip:focus-visible { outline-offset: -3px; }
+.cmp-panel { position: relative; flex: 0 0 44%; scroll-snap-align: start; border-radius: 12px; background: #f7f7f7; overflow: hidden; }
+.cmp-panel.ours { box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--ours) 55%, transparent); }
+.cmp-view { position: relative; aspect-ratio: 1; }
+.cmp-view img { width: 100%; height: 100%; object-fit: contain; }
+.cmp-panel .lbl { position: absolute; left: 8px; bottom: 8px; z-index: 4; font-size: 12px; }
 
 /* ---------------------------------------------------------------- anchor widget */
 .anchor-demo { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 18px; margin-top: 34px; }
@@ -407,7 +414,7 @@ h3 { font-size: clamp(21px, 2vw, 26px); line-height: 1.2; font-weight: 700; lett
 .of-bar i { position: absolute; z-index: 1; top: -2px; bottom: 0; left: 0; width: 2px; margin-left: -1px; background: #fff; box-shadow: 0 0 4px rgba(0,0,0,.5); }
 
 /* interactive sim scenes (assets/js/scene3d.js): the paper render stays in flow as the poster and fallback */
-.s3d { position: relative; touch-action: pan-y; }
+.s3d { position: relative; touch-action: pan-x pan-y; }
 .s3d > img { transition: opacity .4s var(--ease); }
 .s3d.s3d-ready > img { opacity: 0 !important; }
 .s3d-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; opacity: 0; transition: opacity .4s var(--ease); }
@@ -486,6 +493,13 @@ h3 { font-size: clamp(21px, 2vw, 26px); line-height: 1.2; font-weight: 700; lett
 .chart-card:hover .replay, .chart-card .replay:focus-visible { opacity: 1; }
 .chart-card .replay svg { width: 15px; height: 15px; }
 .chart-row { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 26px; align-items: center; margin-top: 8px; }
+/* two charts side by side (a split or test bed per chart) */
+.chart-pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; margin-top: 8px; }
+.chart-pair .chart-card { margin: 0; }
+.chart-card figcaption { padding: 12px 16px 0; font-size: 14.5px; font-weight: 600; color: var(--ink); }
+.dark .chart-card figcaption { color: var(--ink); }
+.chart-na { display: grid; place-items: center; aspect-ratio: 16 / 9; margin: 0; padding: 0 12%; text-align: center; font-size: 14px; color: var(--ink3); }
+.chart-na[hidden], .chart-card video[hidden] { display: none; }
 .chart-row .prose { font-size: 16px; }
 .fallback-table { margin-top: 14px; font-size: 13.5px; color: var(--ink2); }
 .fallback-table summary { cursor: pointer; color: var(--ink3); width: max-content; }
@@ -541,6 +555,7 @@ h3 { font-size: clamp(21px, 2vw, 26px); line-height: 1.2; font-weight: 700; lett
 }
 @media (max-width: 860px) {
   .cmp-grid, .anchor-demo, .src-layout, .emb, .emb-map, .eq-grid { grid-template-columns: minmax(0, 1fr); }
+  .chart-pair { grid-template-columns: minmax(0, 1fr); }
   .hero-nav-links { display: none; }
   .sec { padding: 72px 0 80px; }
   .sub { margin-top: 64px; }

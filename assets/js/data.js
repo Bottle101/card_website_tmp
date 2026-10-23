@@ -56,42 +56,21 @@ export const TILES = {
   ],
 };
 
-// hero montage: [t0, t1) in seconds of assets/video/hero/hero.mp4 (built by _work/scripts/hero_montage.py)
+// hero montage: [t0, t1) in seconds of assets/video/hero/hero.mp4 (built by _work/scripts/hero_montage.py); task = TASKS key the label links to
 export const HERO_SEGMENTS = [
-  { t0: 0, t1: 8.6, label: 'Card deck · SHARPA Wave' },
-  { t0: 8.6, t1: 17, label: "Rubik's cube · SHARPA Wave" },
-  { t0: 17, t1: 24.6, label: 'Mustard bottle · Wuji Hand 2' },
-  { t0: 24.6, t1: 28, label: 'Tongs · Unitree Dex3-1' },
-  { t0: 28, t1: 31.6, label: 'Marker · SHARPA Wave' },
-  { t0: 31.6, t1: 99, label: 'Cup · Wuji Hand 2' },
+  { t0: 0, t1: 8.6, label: 'Card deck · SHARPA Wave', task: 'cards' },
+  { t0: 8.6, t1: 17, label: "Rubik's cube · SHARPA Wave", task: 'cube' },
+  { t0: 17, t1: 24.6, label: 'Mustard bottle · Wuji Hand 2', task: 'mustard' },
+  { t0: 24.6, t1: 28, label: 'Tongs · Unitree Dex3-1', task: 'tongs' },
+  { t0: 28, t1: 31.6, label: 'Marker · SHARPA Wave', task: 'marker' },
+  { t0: 31.6, t1: 99, label: 'Cup · Wuji Hand 2', task: 'cup' },
 ];
 
 // video-to-robot clips: two panels cut from one render, so they share a clock
 export const V2R_AR = { cube: '960 / 430', can: '960 / 430', spray: '960 / 610' };
 
-const SENT = {
-  own67: {
-    contact: 'CARD <strong>43.6%</strong>, its initializer 25.2%, kinematic baselines 2.4 to 2.5%. Glove clips, with measured contact, reach 89%; video 46%.',
-    region: 'Contact by the demonstrated finger: CARD <strong>41.3%</strong>, nearly all its contacts; kinematic baselines 2.4 to 2.5%.',
-    cone: 'Contact with the pad normal within 45° of the push: CARD <strong>18.3%</strong>, initializer 5.7%, kinematic baselines about 1%.',
-    gap: 'Median anchor-to-pad gap: CARD <strong>3.31 mm</strong>, initializer 11.5 mm, kinematic baselines 24 to 25 mm.',
-  },
-  grab: {
-    contact: 'GRAB: CARD <strong>43.1%</strong>, ReGrind (needs the object mesh) 22.5%, kinematic baselines under 5%.',
-    region: 'GRAB: CARD <strong>40.6%</strong>, ReGrind 20.7%, kinematic baselines 4.5 to 4.9%.',
-    cone: 'GRAB: CARD <strong>16.2%</strong>, ReGrind 5.2%, kinematic baselines 1.7%.',
-    gap: 'GRAB: CARD <strong>3.56 mm</strong>, ReGrind 7.86 mm, kinematic baselines about 21 mm.',
-    pen: 'Median deepest penetration of the object mesh: CARD <strong>7.96 mm</strong>, the lowest, ReGrind 9.80 mm, kinematic baselines 12.7 to 13.0 mm. CARD\'s collision term uses this mesh on GRAB.',
-  },
-};
-
 export const FIDELITY = {
-  sentence: (bed, met) => SENT[bed][met] || '',
   text: {
-    vidhaco: {
-      val: 'Validation split: Vid-HACO reaches 84.3 vertex F1 and 92.4 average precision, against 57.1 and 51.7 for HACO and 74.5 and 70.4 for HACO-R (retrained on our data).',
-      hrdexdb: 'Retrained on our data, HACO-R gains in distribution (F1 57.1 to 74.5) but not on HRDexDB, so the gain is the model. Both HACO models flag contact on every frame (trivial frame F1 75.9); Vid-HACO reaches 95.3.',
-    },
     force: {
       grasp: 'Steps of 9.7, 7 and 2.6&nbsp;N (thumb, middle, index) settle, and return to zero on release, within about a second.',
       periodic: 'The index follows a 0 to 4&nbsp;N periodic target within a few tenths of a newton, about 0.2&nbsp;s behind. The 0.5&nbsp;N floor is the contact preload.',

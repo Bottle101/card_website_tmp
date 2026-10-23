@@ -1,8 +1,8 @@
 // CARD project page. Plain ES modules, no build step.
-import { glassify, initSeg } from './liquid-glass.js?v=20261021e';
-import { initAnchorDemo } from './anchor.js?v=20261021e';
-import { TASKS, HANDS, TILES, FIDELITY, HERO_SEGMENTS, V2R_AR, SCENES } from './data.js?v=20261021e';
-import { createViewer, pairViewers } from './scene3d.js?v=20261021e';
+import { glassify, initSeg } from './liquid-glass.js?v=20261022a';
+import { initAnchorDemo } from './anchor.js?v=20261022a';
+import { TASKS, HANDS, TILES, FIDELITY, HERO_SEGMENTS, V2R_AR, SCENES } from './data.js?v=20261022a';
+import { createViewer, pairViewers } from './scene3d.js?v=20261022a';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -97,6 +97,13 @@ function initHero() {
     };
     label.textContent = HERO_SEGMENTS[0].label;
     v.addEventListener('timeupdate', tick);
+    // the label is a link to that task's replay in the hardware section
+    label.addEventListener('click', () => {
+      const seg = HERO_SEGMENTS[Math.max(0, last)], k = TASKS.findIndex(t => t.key === seg.task);
+      const btn = $(`#hw-list button[data-i="${k}"]`), hw = $('#hardware');
+      if (btn) btn.click();
+      if (hw) scrollTo({ top: Math.max(0, $('h2', hw).getBoundingClientRect().top + scrollY - 58 - 22), behavior: reduced ? 'auto' : 'smooth' });
+    });
   }
 }
 
@@ -312,34 +319,29 @@ function halves3d(box, urls, labels) {
 }
 
 /* ------------------------------------------------------------------ baselines viewer */
-const METHOD_NAMES = { card: 'CARD', dexpilot: 'DexPilot', anyteleopk: 'AnyTeleop-K', fingertipik: 'Fingertip IK', init: 'Geometric initialization' };
-const METHOD_NOTES = {
-  card: 'Retargeted to the SHARPA Wave. Orange spheres are the human contact anchors.',
-  dexpilot: 'DexPilot matches fingertip vectors and misses the contact.',
-  anyteleopk: 'AnyTeleop with key vectors also misses the contact.',
-  fingertipik: 'IK on fingertip positions (not in the results table). The pads miss the anchors.',
-  init: 'CARD\'s initializer alone: closer than the baselines, but short of the anchors.',
-};
+const METHODS = [['human', 'Human', 'human'], ['card', 'CARD', 'ours'], ['dexpilot', 'DexPilot', 'kin'], ['anyteleopk', 'AnyTeleop-K', 'kin'],
+  ['fingertipik', 'Fingertip IK', 'kin'], ['init', 'Geometric init', 'kin']];
 function initBaselines() {
   const root = $('#baselines'); if (!root) return;
-  $$('.cmp-card', root).forEach(card => {
-    const clip = card.dataset.clip, holder = $('.robot', card);
-    holder.innerHTML = Object.keys(METHOD_NAMES).map((m, i) =>
-      `<img class="${i === 0 ? 'base on' : ''}" data-m="${m}" src="assets/img/cut/baselines/${clip}_${m}.webp" alt="${METHOD_NAMES[m]} on the ${clip}" loading="lazy">`).join('')
-      + `<span class="lbl glass-tag ours m-tag">CARD</span>`;
-    if (SCENES.baselines.includes(clip))
-      scenePair(card, $('.human', card), holder, [`Human demonstration on the ${clip}, 3D: drag to rotate`, `Robot retargeting on the ${clip}, 3D: drag to rotate`],
-        [`${S3D}baselines/${clip}_human.json`, `${S3D}baselines/${clip}_card.json`]);
-  });
-  $('#base-ctl .seg').addEventListener('pick', e => {
-    const m = e.detail.dataset.m;
-    $$('.cmp-card', root).forEach(card => {
-      $$('.robot img', card).forEach(img => img.classList.toggle('on', img.dataset.m === m));
-      const tag = $('.m-tag', card); tag.textContent = METHOD_NAMES[m]; tag.className = `lbl glass-tag m-tag ${m === 'card' ? 'ours' : 'kin'}`;
-      $('.m-name', card).textContent = METHOD_NAMES[m];
-      if (SCENES.baselines.includes(card.dataset.clip)) sceneSwap(card, `${S3D}baselines/${card.dataset.clip}_${m}.json`);
-    });
-    $('#base-cap').textContent = METHOD_NOTES[m];
+  $$('.cmp-case', root).forEach(card => {
+    const clip = card.dataset.clip, strip = $('.cmp-strip', card), on3d = SCENES.baselines.includes(clip);
+    strip.innerHTML = METHODS.map(([m, name, tag]) =>
+      `<div class="cmp-panel${m === 'card' ? ' ours' : ''}" data-m="${m}"><div class="cmp-view"><img src="assets/img/cut/baselines/${clip}_${m}.webp" alt="${name} on the ${clip}" loading="lazy"></div><span class="lbl glass-tag ${tag}">${name}</span></div>`).join('');
+    $$('.cmp-nav button', card).forEach(b => b.addEventListener('click', () => {
+      const w = $('.cmp-panel', strip).getBoundingClientRect().width + 10;
+      strip.scrollBy({ left: +b.dataset.dir * w * 2, behavior: reduced ? 'auto' : 'smooth' });
+    }));
+    const ends = () => { $('.cmp-nav [data-dir="-1"]', card).disabled = strip.scrollLeft < 4; $('.cmp-nav [data-dir="1"]', card).disabled = strip.scrollLeft + strip.clientWidth > strip.scrollWidth - 4; };
+    strip.addEventListener('scroll', ends, { passive: true }); new ResizeObserver(ends).observe(strip); ends();
+    if (!on3d) return;
+    // all six panels as linked viewers: one viewpoint per case
+    const views = $$('.cmp-view', strip); views.forEach(v => v.classList.add('s3d'));
+    new IntersectionObserver((es, io) => {
+      if (!es[0].isIntersecting) return; io.disconnect();
+      const vs = views.map((v, k) => createViewer(v, { label: `${METHODS[k][1]} on the ${clip}, 3D: drag to rotate`, reset: METHODS[k][0] === 'card' }));
+      vs.forEach((a, k) => vs.slice(k + 1).forEach(b => pairViewers(a, b)));
+      vs.forEach((v, k) => v.show(`${S3D}baselines/${clip}_${METHODS[k][0]}.json`));
+    }, { rootMargin: '600px 0px' }).observe(card);
   });
 }
 
@@ -395,18 +397,17 @@ function initCharts() {
     });
   });
 
-  // contact fidelity: test bed x metric
-  const ctl = $('#fid-ctl'); if (!ctl) return;
-  const bedSeg = $('[data-k="bed"]', ctl), metSeg = $('[data-k="metric"]', ctl), v = $('#fid-video'), text = $('#fid-text');
-  const update = (play = true) => {
-    const bed = pressed(bedSeg).dataset.v; let met = pressed(metSeg).dataset.v;
-    const penBtn = $('button[data-v="pen"]', metSeg); penBtn.disabled = bed !== 'grab';
-    if (bed !== 'grab' && met === 'pen') { $('button[data-v="contact"]', metSeg).click(); return; }
-    text.innerHTML = FIDELITY.sentence(bed, met);
-    if (play) setChart(v, `assets/video/charts/fidelity_${bed}_${met}.mp4`);
-  };
-  bedSeg.addEventListener('pick', () => update()); metSeg.addEventListener('pick', () => update());
-  update(false);
+  // contact fidelity: our clips left, GRAB right, for the picked metric (penetration needs the object mesh: GRAB only)
+  const ctl = $('#fid-ctl'), pair = $('#fid-pair'); if (!ctl || !pair) return;
+  const metSeg = $('[data-k="metric"]', ctl);
+  metSeg.addEventListener('pick', () => {
+    const met = pressed(metSeg).dataset.v;
+    $$('[data-bed]', pair).forEach(card => {
+      const v = $('video', card), na = $('.chart-na', card), none = card.dataset.bed === 'own67' && met === 'pen';
+      v.hidden = none; if (na) na.hidden = !none;
+      if (!none) setChart(v, `assets/video/charts/fidelity_${card.dataset.bed}_${met}.mp4`);
+    });
+  });
 }
 
 /* ------------------------------------------------------------------ wipe compare */

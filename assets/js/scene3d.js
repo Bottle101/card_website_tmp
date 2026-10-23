@@ -31,6 +31,7 @@ const STYLE = {
   anchor: { color: 0xe8731f, roughness: .45, metalness: 0, emissive: 0x6b2a05, emissiveIntensity: .35 },
 };
 const coarse = matchMedia('(pointer: coarse)').matches;
+const MOD = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘' : 'Ctrl';
 
 let shared = null;                                  // { renderer, env }: the one WebGL context, grown to the largest viewer
 function sharedRenderer(L) {
@@ -50,7 +51,7 @@ function sharedRenderer(L) {
 export function createViewer(el, { label = 'Interactive 3D scene', reset = true, compact = false } = {}) {
   let L, cv, ctx, scene, camera, controls, root, pending = 0, mats = {}, home = null, shown = null, peers = [], syncing = false, tags = [], exposure = 1;
   const ui = document.createElement('div'); ui.className = 's3d-ui';
-  ui.innerHTML = `<span class="s3d-hint">${coarse ? 'Tap, then drag to turn' : 'Drag to rotate · scroll to zoom'}</span>`
+  ui.innerHTML = `<span class="s3d-hint">${coarse ? 'Tap, then drag to turn' : `Drag to rotate · ${MOD} + scroll to zoom`}</span>`
     + '<button type="button" class="s3d-reset" aria-label="Reset the view" title="Reset the view"><svg aria-hidden="true"><use href="#i-replay"/></svg></button>';
   const $reset = ui.querySelector('.s3d-reset');
   if (!reset || compact) { $reset.remove(); el.classList.add('s3d-sub'); }   // linked viewers keep one reset and hint, on the main panel
@@ -68,6 +69,8 @@ export function createViewer(el, { label = 'Interactive 3D scene', reset = true,
     camera = new THREE.PerspectiveCamera(30, 1, .005, 20);
     controls = new L.OrbitControls(camera, cv);
     controls.enableDamping = true; controls.dampingFactor = .12; controls.rotateSpeed = .8; controls.zoomSpeed = .8;
+    // a plain wheel or trackpad swipe scrolls the page (and sideways strips); pinch (ctrlKey) or the modifier zooms
+    cv.addEventListener('wheel', e => { if (!e.ctrlKey && !e.metaKey) e.stopImmediatePropagation(); }, { capture: true });
     controls.addEventListener('change', () => { request(); if (!syncing && home) { const st = pose(); peers.forEach(p => p.follow(st)); } });
     controls.addEventListener('start', () => el.classList.add('s3d-used'));
     let down = null;                                // pointer travel, not camera motion (damping keeps moving after a drag)
@@ -77,14 +80,14 @@ export function createViewer(el, { label = 'Interactive 3D scene', reset = true,
       down = null;
     });
     if (coarse) {                                   // let the page scroll over the viewer until it is tapped
-      controls.enabled = false; cv.style.touchAction = 'pan-y';
+      controls.enabled = false; cv.style.touchAction = 'pan-x pan-y';
       cv.addEventListener('click', () => { wake(); peers.forEach(p => p.wake()); });
     }
     for (const [k, s] of Object.entries(STYLE)) mats[k] = new THREE.MeshStandardMaterial(s);
     mats.anchor.name = 'anchor';
     $reset.addEventListener('click', () => { goHome(); peers.forEach(p => p.reset()); });
     new ResizeObserver(resize).observe(el); resize();
-    new IntersectionObserver(es => { if (!es[0].isIntersecting && coarse) { controls.enabled = false; cv.style.touchAction = 'pan-y'; el.classList.remove('s3d-live'); } }).observe(el);
+    new IntersectionObserver(es => { if (!es[0].isIntersecting && coarse) { controls.enabled = false; cv.style.touchAction = 'pan-x pan-y'; el.classList.remove('s3d-live'); } }).observe(el);
   });
 
   function resize() {
