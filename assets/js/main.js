@@ -1,8 +1,8 @@
 // CARD project page. Plain ES modules, no build step.
-import { glassify, initSeg } from './liquid-glass.js?v=20261022a';
-import { initAnchorDemo } from './anchor.js?v=20261022a';
-import { TASKS, HANDS, TILES, FIDELITY, HERO_SEGMENTS, V2R_AR, SCENES } from './data.js?v=20261022a';
-import { createViewer, pairViewers } from './scene3d.js?v=20261022a';
+import { glassify, initSeg } from './liquid-glass.js?v=20261022b';
+import { initAnchorDemo } from './anchor.js?v=20261022b';
+import { TASKS, HANDS, TILES, FIDELITY, HERO_SEGMENTS, V2R_AR, SCENES } from './data.js?v=20261022b';
+import { createViewer, pairViewers } from './scene3d.js?v=20261022b';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -99,10 +99,16 @@ function initHero() {
     v.addEventListener('timeupdate', tick);
     // the label is a link to that task's replay in the hardware section
     label.addEventListener('click', () => {
-      const seg = HERO_SEGMENTS[Math.max(0, last)], k = TASKS.findIndex(t => t.key === seg.task);
+      const seg = HERO_SEGMENTS.find(g => g.label === label.textContent) || HERO_SEGMENTS[0], k = TASKS.findIndex(t => t.key === seg.task);
       const btn = $(`#hw-list button[data-i="${k}"]`), hw = $('#hardware');
       if (btn) btn.click();
-      if (hw) scrollTo({ top: Math.max(0, $('h2', hw).getBoundingClientRect().top + scrollY - 58 - 22), behavior: reduced ? 'auto' : 'smooth' });
+      if (!hw) return;
+      // media above can still be loading and shift the page mid-scroll: re-aim until the heading sits under the nav
+      const h2 = $('h2', hw), aim = (behavior) => scrollTo({ top: Math.max(0, h2.getBoundingClientRect().top + scrollY - 58 - 22), behavior });
+      aim(reduced ? 'auto' : 'smooth');
+      let n = 0;
+      const check = () => { if (Math.abs(h2.getBoundingClientRect().top - 80) > 8 && n++ < 4) { aim('auto'); setTimeout(check, 400); } };
+      setTimeout(check, 1100);
     });
   }
 }
