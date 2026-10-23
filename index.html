@@ -14,11 +14,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
-<link rel="preload" as="image" href="assets/video/hero/hero.jpg?v=20261022b" fetchpriority="high">
-<link rel="stylesheet" href="assets/css/site.css?v=20261022b">
+<link rel="preload" as="image" href="assets/video/hero/hero.jpg?v=20261022c" fetchpriority="high">
+<link rel="stylesheet" href="assets/css/site.css?v=20261022c">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
-<script type="module" src="assets/js/main.js?v=20261022b"></script>
+<script type="module" src="assets/js/main.js?v=20261022c"></script>
 </head>
 <body>
 <a class="skip" href="#idea">Skip to content</a>
@@ -44,8 +44,8 @@
 <!-- ============================================================ hero -->
 <header class="hero" id="top">
   <div class="hero-media" aria-hidden="true">
-    <img class="hero-poster" src="assets/video/hero/hero.jpg?v=20261022b" width="1920" height="1080" alt="">
-    <video id="hero-video" muted loop playsinline preload="none" data-video="assets/video/hero/hero.mp4?v=20261022b" tabindex="-1"></video>
+    <img class="hero-poster" src="assets/video/hero/hero.jpg?v=20261022c" width="1920" height="1080" alt="">
+    <video id="hero-video" muted loop playsinline preload="none" data-video="assets/video/hero/hero.mp4?v=20261022c" tabindex="-1"></video>
   </div>
   <div class="hero-shade"></div>
   <nav class="hero-nav" aria-label="Primary">
@@ -470,17 +470,6 @@
       <p class="cap">ReGrind needs the object mesh, so it runs on GRAB only.</p>
     </details>
 
-    <div class="sub">
-      <h3 class="reveal">The friction-cone term trades reach for direction</h3>
-      <div class="chart-row reveal">
-        <div class="chart-card tall"><video class="chart" muted playsinline preload="none" data-rest="end" data-src="assets/video/charts/ablation_tradeoff.mp4" poster="assets/video/charts/ablation_tradeoff.jpg" aria-label="Scatter of contact rate against in-cone rate for every ablation variant"></video><button class="replay glass light" type="button" aria-label="Replay chart"><svg aria-hidden="true"><use href="#i-replay"/></svg></button></div>
-        <div class="prose">
-          <p>Without the cone term the solver reaches more anchors (69.1% against 61.9%) but only 54.6% in cone. With it, every variant stays near 80%; the full method reaches 82.2%.</p>
-          <p>A small pull toward the human's touch point (<span class="tex">\alpha_f=0.15</span>) adds contact. Dropping the initializer costs about ten points.</p>
-          <p class="cap" style="margin-top:12px">20 video clips with HACO anchors (4,297 anchor-frames); not comparable with the table above.</p>
-        </div>
-      </div>
-    </div>
   </div>
 </section>
 
