@@ -1,8 +1,8 @@
 // CARD project page. Plain ES modules, no build step.
-import { glassify, initSeg } from './liquid-glass.js?v=20261022c';
-import { initAnchorDemo } from './anchor.js?v=20261022c';
-import { TASKS, HANDS, TILES, FIDELITY, HERO_SEGMENTS, V2R_AR, SCENES } from './data.js?v=20261022c';
-import { createViewer, pairViewers } from './scene3d.js?v=20261022c';
+import { glassify, initSeg } from './liquid-glass.js?v=20261025a';
+import { initAnchorDemo } from './anchor.js?v=20261025a';
+import { TASKS, HANDS, TILES, FIDELITY, HERO_SEGMENTS, SCENES } from './data.js?v=20261025a';
+import { createViewer, pairViewers } from './scene3d.js?v=20261025a';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -87,19 +87,23 @@ function initHero() {
   document.addEventListener('visibilitychange', sync);
   if (reduced || saveData) { btn.hidden = false; btn.classList.add('paused'); userPaused = true; btn.setAttribute('aria-label', 'Play background video'); }
 
-  // which task is on screen: a small tag that follows the montage
+  // which replay is on screen: a tag with the task and hand that follows the montage
   if (label && HERO_SEGMENTS.length) {
     let last = -1;
+    const show = i => {
+      const t = TASKS.find(x => x.key === HERO_SEGMENTS[i].task);
+      label.textContent = `${t.name} · ${t.hand}`; label.setAttribute('aria-label', `Open-loop replay: ${t.name} on the ${t.hand}. Show it in the hardware section`);
+    };
     const tick = () => {
       const t = v.currentTime; let i = HERO_SEGMENTS.findIndex(s => t >= s.t0 && t < s.t1);
       if (i < 0) i = 0;
-      if (i !== last) { last = i; label.textContent = HERO_SEGMENTS[i].label; }
+      if (i !== last) { last = i; show(i); }
     };
-    label.textContent = HERO_SEGMENTS[0].label;
+    show(0);
     v.addEventListener('timeupdate', tick);
     // the label is a link to that task's replay in the hardware section
     label.addEventListener('click', () => {
-      const seg = HERO_SEGMENTS.find(g => g.label === label.textContent) || HERO_SEGMENTS[0], k = TASKS.findIndex(t => t.key === seg.task);
+      const seg = HERO_SEGMENTS[Math.max(0, last)], k = TASKS.findIndex(t => t.key === seg.task);
       const btn = $(`#hw-list button[data-i="${k}"]`), hw = $('#hardware');
       if (btn) btn.click();
       if (!hw) return;
@@ -326,7 +330,7 @@ function halves3d(box, urls, labels) {
 
 /* ------------------------------------------------------------------ baselines viewer */
 const METHODS = [['human', 'Human', 'human'], ['card', 'CARD', 'ours'], ['dexpilot', 'DexPilot', 'kin'], ['anyteleopk', 'AnyTeleop-K', 'kin'],
-  ['fingertipik', 'Fingertip IK', 'kin'], ['init', 'Geometric init', 'kin']];
+  ['fingertipik', 'AnyTeleop-P', 'kin'], ['init', 'CARD (init only)', 'kin']];
 function initBaselines() {
   const root = $('#baselines'); if (!root) return;
   $$('.cmp-case', root).forEach(card => {
@@ -361,6 +365,8 @@ function initSources() {
       $$('video', p).forEach(v => { if (on) { ensureSrc(v); if (!reduced) v.play().catch(() => {}); } else v.pause(); });
     });
   });
+  // stage 1's source cards jump to their tab
+  $$('[data-src-tab]').forEach(a => a.addEventListener('click', () => $(`button[data-tab="${a.dataset.srcTab}"]`, seg)?.click()));
   const pair = $('[data-panel="mocap"] .src-main.pair');
   if (pair && SCENES.galleryFrames.includes('mocap_power'))
     halves3d(pair, [`${S3D}gallery/mocap_power_frame.json`, `${S3D}gallery/mocap_power.json`],
@@ -394,12 +400,13 @@ function initSources() {
 
 /* ------------------------------------------------------------------ chart toggles */
 function initCharts() {
+  // stage 5: force-tracking clips redrawn from the paper's figure, one test at a time
   $$('[data-chart]').forEach(seg => {
     const g = seg.dataset.chart, v = $(`video[data-group="${g}"]`);
     seg.addEventListener('pick', e => {
-      setChart(v, `assets/video/charts/${g === 'force' ? 'force' : g}_${e.detail.dataset.v}.mp4`);
+      setChart(v, `assets/video/charts/${g}_${e.detail.dataset.v}.mp4`);
       const txt = FIDELITY.text[g]?.[e.detail.dataset.v]; const el = $(`#${g}-text`);
-      if (txt && el) el.innerHTML = `<p>${txt}</p>`;
+      if (txt && el) el.innerHTML = txt;
     });
   });
 
@@ -458,14 +465,24 @@ function initWipe() {
   });
 }
 
-/* ------------------------------------------------------------------ video to robot (synced 2-up, swappable) */
-function initV2R() {
-  const p = $('#v2r'); if (!p) return;
-  $('#v2r-ctl').addEventListener('pick', e => {
-    const k = e.detail.dataset.v, [a, b] = $$('video', p);
-    p.style.setProperty('--ar', V2R_AR[k]);
-    [[a, 'human'], [b, 'robot']].forEach(([v, s]) => { v.dataset.src = `assets/video/v2r/${k}_${s}.mp4`; v.poster = `assets/video/v2r/${k}_${s}.jpg`; ensureSrc(v); });
-    p._tr.seek(0); if (!reduced) p._tr.play();
+/* ------------------------------------------------------------------ Vid-HACO vs HACO (one composited clip per take, swappable) */
+const VH = {
+  toytruck: { label: 'An egocentric video of two hands assembling a toy truck: the right hand pushes a tire on, fits a screw and tightens it with a screwdriver',
+    cap: 'Toy assembly from WGO-Bench, right hand. HACO reports contact on every frame; Vid-HACO&rsquo;s contact drops each time the hand lets go of one part to reach for the next.' },
+  cube: { label: "A hand reaches for a Rubik's cube, grasps and turns it, and lets go",
+    cap: 'Phone video not used in training. HACO reports contact on every frame, including the reach before the hand touches anything; Vid-HACO stays essentially off before the grasp and after the release.' },
+  hub: { label: 'A hand reaches for a USB hub, grasps it, re-grasps it and lets go',
+    cap: 'Phone video not used in training. HACO reports contact on every frame, including the reach through the air; Vid-HACO turns on as the thumb meets the hub and off at the release.' },
+};
+const VH_SAME = ' Both models see the same frames and tracked hand crops, thresholded at 0.52 with no smoothing.';
+function initVidHaco() {
+  const p = $('#vh-player'), ctl = $('#vh-ctl'); if (!p || !ctl) return;
+  ctl.addEventListener('pick', e => {
+    const k = e.detail.dataset.v, v = $('video', p);
+    v.dataset.src = `assets/video/vidhaco/haco_vs_vidhaco_${k}.mp4`; v.poster = `assets/video/vidhaco/haco_vs_vidhaco_${k}.jpg`;
+    v.setAttribute('aria-label', `${VH[k].label}. Right: contact predicted by HACO and by Vid-HACO on the MANO hand. Bottom: contacting vertices per frame for each model.`);
+    $('#vh-cap').innerHTML = VH[k].cap + VH_SAME;
+    ensureSrc(v); p._tr.seek(0); if (!reduced) p._tr.play();
   });
 }
 
@@ -488,7 +505,11 @@ function initHardware() {
     $$('button', frames).forEach(b => b.addEventListener('click', () => { ensureSrc(v); tr.seek(+b.dataset.t); }));
     tr.setTicks(t.frames.map((s, k) => ({ t: s.t })));
     if (autoplay) ensureSrc(v); else near.observe(v);
-    if (t.demo) { demoCard.hidden = false; demo.removeAttribute('poster'); demo.dataset.poster = t.demo.replace(/\.mp4$/, '.jpg'); demo.dataset.src = t.demo; if (autoplay) { ensureSrc(demo); if (!reduced) demo.play().catch(() => {}); } }
+    if (t.demo) {
+      demoCard.hidden = false; demo.removeAttribute('poster'); demo.dataset.poster = t.demo.replace(/\.mp4$/, '.jpg'); demo.dataset.src = t.demo;
+      $('#hw-demo-tag').textContent = `Human demonstration · ${t.demoSrc}`; demo.setAttribute('aria-label', `Human demonstration of the ${t.name.toLowerCase()}, ${t.demoSrc.toLowerCase()}`);
+      if (autoplay) { ensureSrc(demo); if (!reduced) demo.play().catch(() => {}); }
+    }
     else { demoCard.hidden = true; demo.pause(); }
     $('#hw-desc').innerHTML = t.desc;
     if (autoplay && !reduced) tr.play(); else tr.render(0);
@@ -500,14 +521,13 @@ function initHardware() {
 }
 
 /* ------------------------------------------------------------------ tracker on/off */
-// Paired clips (assets/video/tactile, cut by _work/scripts/tactile_pairs.py); the hammer has only the paper's stills.
+// Paired clips (assets/video/tactile, cut by _work/scripts/tactile_pairs.py). rate: successes over 10 trials (paper, Sec. 4.2).
 // fail: [from s, to s, what goes wrong] in the clip without the tracker, read off the footage frame by frame.
 const ONOFF = {
-  cards: { noun: 'card deck', res: ['Card picked up', 'No card lifted'], fail: [[5.3, 99, 'The pinch closes on air: the top card stays on the deck']] },
-  mustard: { noun: 'mustard bottle', res: ['Dispensed', 'Nothing comes out'], fail: [[9, 15.6, 'Bottle held over the glass but not squeezed: no mustard comes out']] },
-  wipe: { noun: 'whiteboard', res: ['Erased', 'Ink stays'], fail: [[13.5, 17.5, 'The eraser passes over the ink without pressing it off'], [24, 99, 'Ink still on the board']] },
-  hammer: { noun: 'hammer', res: ['Held', 'Slipped'], still: true, fail: [[0, 99, 'The hammer slips out of the grasp']] },
-  cup: { noun: 'cup', res: ['Held', 'Slipped'], fail: [[4.8, 9.8, 'The cup slips and tilts in the grasp']] },
+  hammer: { noun: 'hammer', res: ['Held', 'Slipped'], rate: ['8/10', '1/10'], fail: [[5.5, 99, 'The handle pivots out of the fingers as the hand lifts, and the hammer drops back to the table']] },
+  cup: { noun: 'cup', res: ['Held', 'Slipped'], rate: ['10/10', '3/10'], fail: [[4.8, 7.3, 'The cup tilts and slides down through the fingers']] },
+  mustard: { noun: 'mustard bottle', res: ['Dispensed', 'Nothing comes out'], rate: ['7/10', '0/10'], fail: [[9, 15.5, 'Bottle held nozzle-down over the glass but not squeezed: no mustard comes out']] },
+  cards: { noun: 'card deck', res: ['Card picked up', 'Card falls back'], fail: [[4.7, 99, 'The card tips up in the pinch, slips out and falls back onto the deck']] },
 };
 function initOnOff() {
   const box = $('#onoff'); if (!box) return;
@@ -549,29 +569,24 @@ function initOnOff() {
     cards.forEach((card, k) => {
       const s = k ? 'off' : 'on';
       const what = k ? ` ${d.fail.map(f => f[2]).join('; ')}.` : '';
-      const label = (k ? `Position replay only: ${d.noun}, ${d.res[1].toLowerCase()}.` : `With the tactile tracker: ${d.noun}, ${d.res[0].toLowerCase()}.`) + what;
-      let el;
-      if (d.still) {
-        el = document.createElement('img');
-        el.src = `assets/img/cut/tactile/${t}_${s}.webp`; el.alt = label;
-      } else {
-        el = document.createElement('video');
-        el.muted = true; el.playsInline = true; el.preload = 'none';
-        el.setAttribute('muted', ''); el.setAttribute('playsinline', '');
-        el.poster = `assets/video/tactile/${t}_${s}.jpg`;
-        el.dataset.src = `assets/video/tactile/${t}_${s}.mp4`;
-        el.setAttribute('aria-label', label);
-        el.addEventListener('ended', ended);
-        el.addEventListener('loadedmetadata', () => { spans(card, el, k ? d.fail : []); mark(); });
-        el.addEventListener('seeked', mark);
-        vids.push(el);
-      }
+      const rate = d.rate ? `, ${d.rate[k]} trials succeed` : '';
+      const label = (k ? `Position replay only: ${d.noun}, ${d.res[1].toLowerCase()}${rate}.` : `With the tactile tracker: ${d.noun}, ${d.res[0].toLowerCase()}${rate}.`) + what;
+      const el = document.createElement('video');
+      el.muted = true; el.playsInline = true; el.preload = 'none';
+      el.setAttribute('muted', ''); el.setAttribute('playsinline', '');
+      el.poster = `assets/video/tactile/${t}_${s}.jpg`;
+      el.dataset.src = `assets/video/tactile/${t}_${s}.mp4`;
+      el.setAttribute('aria-label', label);
+      el.addEventListener('ended', ended);
+      el.addEventListener('loadedmetadata', () => { spans(card, el, k ? d.fail : []); mark(); });
+      el.addEventListener('seeked', mark);
+      vids.push(el);
       card.firstElementChild.replaceWith(el);
-      $('.res', card).textContent = d.res[k];
-      $('.of-bar', card).hidden = !!d.still; $$('.of-bar s', card).forEach(e => e.remove());
+      $('.res', card).textContent = d.rate ? `${d.res[k]} · ${d.rate[k]} trials` : d.res[k];
+      $$('.of-bar s', card).forEach(e => e.remove());
     });
-    // a still, or no motion: name the failure without waiting for the frame
-    const fixed = d.still || reduced;
+    // no motion: name the failure without waiting for the frame
+    const fixed = reduced;
     offCard.classList.toggle('failing', fixed);
     callTxt.textContent = fixed ? d.fail[0][2] : '';
     if (!fixed) mark();
@@ -738,12 +753,15 @@ initPipeline3d();
 initSources();
 initCharts();
 initWipe();
-initV2R();
+initVidHaco();
 initHardware();
 initOnOff();
 initEmbodiments();
 initBib();
 initPipeline();
-initMethod(initAnchorDemo($('#anchor-demo')));
+// the stage 4 widget is optional: if it fails, the rest of the page still boots
+let anchorDemo = null;
+try { anchorDemo = initAnchorDemo($('#anchor-demo')); } catch (err) { console.error(err); }
+initMethod(anchorDemo);
 initThumbs3d();
 glassify();

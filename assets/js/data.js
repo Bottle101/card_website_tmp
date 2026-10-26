@@ -5,34 +5,34 @@ const fr = (task, ts) => ts.map((t, i) => ({ t, img: `${C}realworld/${task}_f${i
 
 export const TASKS = [
   { key: 'cube', name: "Rubik's cube pick-up", hand: 'SHARPA Wave', video: `${V}realworld/cube_crop.mp4`, poster: `${V}realworld/cube_crop.jpg`, thumb: `${V}realworld/cube_crop.jpg`,
-    frames: fr('cube', [0.50, 3.03, 5.22, 8.15]),
+    frames: fr('cube', [0.50, 3.03, 5.22, 8.15]), demo: `${V}demos/cube.mp4`, demoSrc: 'Tactile glove',
     desc: 'A fingertip grasp lifts the cube and sets it back down.' },
   { key: 'cards', name: 'Card deck pick-up', hand: 'SHARPA Wave', video: `${V}realworld/cards_crop.mp4`, poster: `${V}realworld/cards_crop.jpg`, thumb: `${V}realworld/cards_crop.jpg`,
-    frames: fr('cards', [0.50, 5.63, 33.50, 116.63]), demo: `${V}far/human_demo_cards_desk.mp4`,
-    desc: 'The index presses the top card, then thumb and index pinch it up and lay it beside the deck. The take runs several deals.' },
+    frames: fr('cards', [0.50, 5.63, 33.50, 116.63]), demo: `${V}demos/cards.mp4`, demoSrc: 'Tactile glove',
+    desc: 'The index finger presses on the top card, then thumb and index pinch it up and place it beside the deck, card after card.' },
   { key: 'marker', name: 'Marker pick-up', hand: 'SHARPA Wave', video: `${V}realworld/marker_crop.mp4`, poster: `${V}realworld/marker_crop.jpg`, thumb: `${V}realworld/marker_crop.jpg`,
-    frames: fr('marker', [0.47, 6.22, 10.78, 13.95]),
-    desc: 'A pinch lifts the flat marker into a pen-like grip.' },
+    frames: fr('marker', [0.47, 6.22, 10.78, 13.95]), demo: `${V}demos/marker.mp4`, demoSrc: 'Tactile glove',
+    desc: 'A pinch picks the marker up from the table into a pen-like grip.' },
   { key: 'mustard', name: 'Mustard palm grasp', hand: 'Wuji Hand 2', video: `${V}realworld/mustard_crop.mp4`, poster: `${V}realworld/mustard_crop.jpg`, thumb: `${V}realworld/mustard_crop.jpg`,
-    frames: fr('mustard', [0.50, 5.58, 8.40, 11.52]),
+    frames: fr('mustard', [0.50, 5.58, 8.40, 11.52]), demo: `${V}demos/mustard.mp4`, demoSrc: 'Motion capture',
     desc: 'The whole hand wraps the soft bottle, tilts it cap-down and sets it upright.' },
   { key: 'cup', name: 'Cup pick-up', hand: 'Wuji Hand 2', video: `${V}realworld/cup_crop.mp4`, poster: `${V}realworld/cup_crop.jpg`, thumb: `${V}realworld/cup_crop.jpg`,
-    frames: fr('cup', [0.50, 3.62, 5.23, 7.87]),
-    desc: 'A thin plastic cup, taken near the rim, lifted, tilted and put back.' },
+    frames: fr('cup', [0.50, 3.62, 5.23, 7.87]), demo: `${V}demos/cup.mp4`, demoSrc: 'Phone video',
+    desc: 'The hand takes a thin plastic cup near the rim, lifts and tilts it, and puts it back.' },
   { key: 'tongs', name: 'Tong use', hand: 'Unitree Dex3-1', video: `${V}realworld/tongs_crop.mp4`, poster: `${V}realworld/tongs_crop.jpg`, thumb: `${V}realworld/tongs_crop.jpg`,
-    frames: fr('tongs', [0.00, 2.28, 6.57, 11.65]), demo: `${V}far/human_demo_tongs_contact_mesh.mp4`,
+    frames: fr('tongs', [0.00, 2.28, 6.57, 11.65]), demo: `${V}far/human_demo_tongs_contact_mesh.mp4`, demoSrc: 'Phone video',
     desc: 'A three-finger hand squeezes the tongs shut and opens them.' },
 ];
 
 export const HANDS = {
   sharpa: { name: 'SHARPA Wave', map: `${C}semantic/sharpa.webp`, real: { video: `${V}realworld/cube_crop.mp4`, label: "Rubik's cube pick-up" },
-    note: '22 joints. Regions map one-to-one, the pinky base to the pinky metacarpal.' },
+    note: '22 DoF with fingertip tactile sensing. Regions map one-to-one; the pinky base maps to the pinky metacarpal.' },
   wuji: { name: 'Wuji Hand 2', map: `${C}semantic/wuji.webp`, real: { video: `${V}realworld/mustard_crop.mp4`, label: 'Mustard palm grasp' },
-    note: 'Five three-link fingers: regions map one-to-one.' },
+    note: 'Five three-link fingers, so regions map one-to-one. No tactile sensing, but its compliant inner surfaces conform to the object, so the grasp needs no scaling.' },
   dex3: { name: 'Unitree Dex3-1', map: `${C}semantic/dex3.webp`, real: { video: `${V}realworld/tongs_crop.mp4`, label: 'Tong use' },
-    note: 'Three fingers. Middle, ring and pinky fold onto the third; anchors that touch at once merge at their force-weighted centroid.' },
+    note: 'Three fingers: middle, ring and pinky map to the third, and anchors that touch at once merge at their force-weighted centroid. No tactile sensing, so grasp actions are scaled by a fixed 1.2&times;.' },
   gripper: { name: 'Parallel-jaw gripper', map: `${C}semantic/gripper.webp`, real: null,
-    note: 'Two pads: the thumb on one jaw, the four fingers on the other, from tip to base.' },
+    note: 'Two jaws: the thumb maps to one, the four fingers to the other, with distal, middle and proximal regions on the tip, middle and base of the jaw.' },
 };
 
 export const TILES = {
@@ -56,24 +56,22 @@ export const TILES = {
   ],
 };
 
-// hero montage: [t0, t1) in seconds of assets/video/hero/hero.mp4 (built by _work/scripts/hero_montage.py); task = TASKS key the label links to
+// hero montage: [t0, t1) in seconds of assets/video/hero/hero.mp4 (built by _work/scripts/hero_montage.py); task = TASKS key
+// the label names and links to (its name and hand come from TASKS)
 export const HERO_SEGMENTS = [
-  { t0: 0, t1: 8.6, label: 'Card deck · SHARPA Wave', task: 'cards' },
-  { t0: 8.6, t1: 17, label: "Rubik's cube · SHARPA Wave", task: 'cube' },
-  { t0: 17, t1: 24.6, label: 'Mustard bottle · Wuji Hand 2', task: 'mustard' },
-  { t0: 24.6, t1: 28, label: 'Tongs · Unitree Dex3-1', task: 'tongs' },
-  { t0: 28, t1: 31.6, label: 'Marker · SHARPA Wave', task: 'marker' },
-  { t0: 31.6, t1: 99, label: 'Cup · Wuji Hand 2', task: 'cup' },
+  { t0: 0, t1: 8.6, task: 'cards' },
+  { t0: 8.6, t1: 17, task: 'cube' },
+  { t0: 17, t1: 24.6, task: 'mustard' },
+  { t0: 24.6, t1: 28, task: 'tongs' },
+  { t0: 28, t1: 31.6, task: 'marker' },
+  { t0: 31.6, t1: 99, task: 'cup' },
 ];
-
-// video-to-robot clips: two panels cut from one render, so they share a clock
-export const V2R_AR = { cube: '960 / 430', can: '960 / 430', spray: '960 / 610' };
 
 export const FIDELITY = {
   text: {
     force: {
-      grasp: 'Steps of 9.7, 7 and 2.6&nbsp;N (thumb, middle, index) settle, and return to zero on release, within about a second.',
-      periodic: 'The index follows a 0 to 4&nbsp;N periodic target within a few tenths of a newton, about 0.2&nbsp;s behind. The 0.5&nbsp;N floor is the contact preload.',
+      grasp: 'Three-finger grasp during the mustard-bottle pick-up replay, with step targets of 9.7, 7 and 2.6&nbsp;N (thumb, middle, index): the forces reach their set-points within a second of the step, the thumb overshoots while the bottle settles, and release returns every finger to zero within about a second.',
+      periodic: 'Against a fixed object, the index finger follows a 0&ndash;4&nbsp;N periodic target: the measured force reaches the peaks within a few tenths of a newton and lags the target by about 0.2&nbsp;s. The floor near 0.5&nbsp;N is the preload kept while in contact.',
     },
   },
 };
