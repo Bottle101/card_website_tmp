@@ -14,12 +14,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
-<link rel="preload" as="image" href="assets/video/hero/hero.jpg?v=20261025a" fetchpriority="high">
-<link rel="stylesheet" href="assets/css/site.css?v=20261025a">
-<link rel="stylesheet" href="assets/css/anchor.css?v=20261025a">
+<link rel="preload" as="image" href="assets/video/hero/hero.jpg?v=20261026a" fetchpriority="high">
+<link rel="stylesheet" href="assets/css/site.css?v=20261026a">
+<link rel="stylesheet" href="assets/css/anchor.css?v=20261026a">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
-<script type="module" src="assets/js/main.js?v=20261025a"></script>
+<script type="module" src="assets/js/main.js?v=20261026a"></script>
 </head>
 <body>
 <a class="skip" href="#idea">Skip to content</a>
@@ -45,8 +45,8 @@
 <!-- ============================================================ hero -->
 <header class="hero" id="top">
   <div class="hero-media" aria-hidden="true">
-    <img class="hero-poster" src="assets/video/hero/hero.jpg?v=20261025a" width="1920" height="1080" alt="">
-    <video id="hero-video" muted loop playsinline preload="none" data-video="assets/video/hero/hero.mp4?v=20261025a" tabindex="-1"></video>
+    <img class="hero-poster" src="assets/video/hero/hero.jpg?v=20261026a" width="1920" height="1080" alt="">
+    <video id="hero-video" muted loop playsinline preload="none" data-video="assets/video/hero/hero.mp4?v=20261026a" tabindex="-1"></video>
   </div>
   <div class="hero-shade"></div>
   <nav class="hero-nav" aria-label="Primary">
@@ -56,7 +56,7 @@
     </div>
   </nav>
   <div class="hero-content">
-    <h1><span class="h1-name">CARD<span class="sr">:</span></span><span class="h1-sub"><span class="acc">Contact-Anchored Retargeting</span> for Dexterous Manipulation</span></h1>
+    <h1><span class="h1-name"><img class="h1-icon" src="assets/img/card_joker.png" width="188" height="256" alt="">CARD<span class="sr">:</span></span><span class="h1-sub"><span class="acc">Contact-Anchored Retargeting</span><br class="h1-br"> for Dexterous Manipulation</span></h1>
     <p class="hero-summary">CARD extracts, preserves, and tracks contact force targets from human demonstrations.</p>
     <details class="hero-abstract">
       <summary>Abstract</summary>
@@ -177,9 +177,9 @@
           <h3><span class="stage-mark" aria-hidden="true">1</span>Human demonstration</h3>
           <p>Any recording that provides hand pose and contact can be used.</p>
           <div class="src-icons">
-            <a class="src-icon" href="#sources" data-src-tab="video"><svg aria-hidden="true"><use href="#i-src-video"/></svg><b>Phone video</b><span>HaWoR hand pose, Vid-HACO contact</span></a>
-            <a class="src-icon" href="#sources" data-src-tab="glove"><svg aria-hidden="true"><use href="#i-src-glove"/></svg><b>Tactile glove</b><span>744-taxel pressure, wrist tracker</span></a>
-            <a class="src-icon" href="#sources" data-src-tab="mocap"><svg aria-hidden="true"><use href="#i-src-mocap"/></svg><b>Motion capture</b><span>OptiTrack markers over the tactile glove</span></a>
+            <a class="src-icon" href="#src-video"><svg aria-hidden="true"><use href="#i-src-video"/></svg><b>Phone video</b><span>HaWoR hand pose, Vid-HACO contact</span></a>
+            <a class="src-icon" href="#src-glove"><svg aria-hidden="true"><use href="#i-src-glove"/></svg><b>Tactile glove</b><span>744-taxel pressure, wrist tracker</span></a>
+            <a class="src-icon" href="#src-mocap"><svg aria-hidden="true"><use href="#i-src-mocap"/></svg><b>Motion capture</b><span>OptiTrack markers over the tactile glove</span></a>
           </div>
         </article>
 
@@ -268,66 +268,25 @@
 <section class="sec dark" id="sources">
   <div class="wrap">
     <h2 class="reveal">Three sources, one representation</h2>
-    <p class="lead reveal">Each source measures hand pose and contact differently. All three end as the same anchored MANO sequence, so one set of solver weights serves them all.</p>
-
-    <div class="controls reveal">
-      <div class="seg glass" role="group" aria-label="Demonstration source" data-tabs="src">
-        <span class="seg-thumb"></span>
-        <button type="button" aria-pressed="true" data-tab="video">Phone video</button>
-        <button type="button" aria-pressed="false" data-tab="glove">Tactile glove</button>
-        <button type="button" aria-pressed="false" data-tab="mocap">Motion capture + glove</button>
+    <p class="lead reveal">Each source ends as the same anchored MANO sequence, so one set of solver weights serves all three.</p>
+    <div class="src3 reveal">
+      <div class="src-col" id="src-video">
+        <h3>Phone video</h3>
+        <p class="src-note">HaWoR hand pose, Vid-HACO contact</p>
+        <div class="media-card src-main"><video muted loop playsinline preload="none" class="inview" data-src="assets/video/drive/vision_contact_cube_pick.mp4" poster="assets/video/drive/vision_contact_cube_pick.jpg" aria-label="Phone video of a hand picking up a Rubik's cube, with the contact predicted by Vid-HACO on the MANO hand, back and palm"></video></div>
+        <div class="tiles" data-tiles="video"></div>
       </div>
-    </div>
-    <div class="panel-set reveal" data-panels="src">
-      <div data-panel="video" class="on">
-        <div class="src-layout">
-          <div class="media-card src-main">
-            <video muted loop playsinline preload="none" class="inview" data-src="assets/video/drive/vision_contact_cube_pick.mp4" poster="assets/video/drive/vision_contact_cube_pick.jpg" aria-label="Phone video of a hand picking up a Rubik's cube, with the predicted contact drawn on a MANO hand"></video>
-            <div class="tags br"><span class="glass-tag ours">Vid-HACO contact</span></div>
-          </div>
-          <div class="src-side">
-            <ol class="src-steps">
-              <li><b>Hand pose</b>HaWoR tracks the hand in the world frame from a single phone video.</li>
-              <li><b>Contact</b>Vid-HACO predicts which of the 778 MANO vertices touch the object, a binary mask per frame (<a href="#vidhaco">evaluation below</a>).</li>
-              <li><b>Anchors</b>Each region&rsquo;s contacting vertices give <span class="tex">c_f</span> and <span class="tex">\hat d_f</span>. Video measures no force, so <span class="tex">F_f</span> comes from a whole-clip grasp balance: the smallest smooth forces that bring each grasp&rsquo;s net wrench to zero.</li>
-            </ol>
-            <div class="tiles" data-tiles="video"></div>
-          </div>
-        </div>
+      <div class="src-col" id="src-glove">
+        <h3>Tactile glove</h3>
+        <p class="src-note">744-taxel pressure, wrist tracker</p>
+        <div class="media-card src-main fill"><video muted loop playsinline preload="none" class="inview" data-src="assets/video/demos/cube.mp4" poster="assets/video/demos/cube.jpg" aria-label="A hand in the tactile glove, with a wrist tracker, picks up a Rubik's cube, turns it and sets it down"></video></div>
+        <div class="tiles" data-tiles="glove"></div>
       </div>
-      <div data-panel="glove">
-        <div class="src-layout">
-          <div class="src-main trio">
-            <figure><img src="assets/img/cut/pipeline/source_input.webp" alt="A hand in a tactile glove holding a Rubik's cube, with the 24 by 31 taxel pressure grid inset" loading="lazy"><figcaption>Taxel pressure</figcaption></figure>
-            <figure><img src="assets/img/cut/pipeline/raw_contact.webp" alt="The taxel pressures registered onto the MANO hand mesh, darker blue for more pressure" loading="lazy"><figcaption>Pressure on MANO</figcaption></figure>
-            <figure><img src="assets/img/cut/pipeline/unified_hand.webp" alt="One contact force anchor per hand region, drawn as an arrow at the center of pressure" loading="lazy"><figcaption>One anchor per region</figcaption></figure>
-          </div>
-          <div class="src-side">
-            <ol class="src-steps">
-              <li><b>Hand pose</b>A wrist-mounted tracker gives the hand motion.</li>
-              <li><b>Contact</b>744 taxels measure contact and pressure directly; each taxel is registered to a vertex of a personalized MANO mesh.</li>
-              <li><b>Anchors</b>Within each region the taxel pressures weight the contacting vertices: <span class="tex">c_f</span> is their weighted centroid, <span class="tex">\hat d_f</span> their weighted mean normal and <span class="tex">F_f</span> the total pressure. With measured contact, CARD establishes 89% of the glove anchor-frames.</li>
-            </ol>
-            <div class="tiles" data-tiles="glove"></div>
-          </div>
-        </div>
-      </div>
-      <div data-panel="mocap">
-        <div class="src-layout">
-          <div class="media-card src-main pair">
-            <img src="assets/img/cut/gallery/mocap_power_frame.webp" alt="Motion capture: tracked hand and scanned bottle in a power grasp" loading="lazy">
-            <img src="assets/img/cut/gallery/mocap_power_contact.webp" alt="The same frame's contact on the MANO hand from the glove taxels" loading="lazy">
-            <div class="tags br"><span class="glass-tag plain">Tracked hand and object, glove contact</span></div>
-          </div>
-          <div class="src-side">
-            <ol class="src-steps">
-              <li><b>Hand pose</b>The tactile glove is worn under OptiTrack markers, which give drift-free wrist motion and track the object.</li>
-              <li><b>Contact</b>Contact and pressure come from the same glove taxels as above, not from the markers.</li>
-              <li><b>Anchors</b>Extracted exactly as for the glove. GRAB enters through its own annotations, with contact from hand&ndash;object proximity in place of pressure.</li>
-            </ol>
-            <div class="tiles" data-tiles="mocap"></div>
-          </div>
-        </div>
+      <div class="src-col" id="src-mocap">
+        <h3>Motion capture + glove</h3>
+        <p class="src-note">OptiTrack markers over the tactile glove</p>
+        <div class="media-card src-main fill"><video muted loop playsinline preload="none" class="inview" data-src="assets/video/demos/mustard.mp4" poster="assets/video/demos/mustard.jpg" aria-label="Motion capture: the tracked MANO hand grasps and moves a scanned mustard bottle"></video></div>
+        <div class="tiles" data-tiles="mocap"></div>
       </div>
     </div>
   </div>
@@ -338,20 +297,13 @@
   <div class="wrap">
     <h2 class="reveal">Contact from video: Vid-HACO</h2>
     <p class="lead reveal">Vid-HACO predicts per-vertex hand contact from 8-frame video clips with a V-JEPA&nbsp;2.1 encoder, trained on 1.55M frames from 12 datasets. On held-out HRDexDB it raises vertex F1 from 63.3 to 67.2 and average precision from 54.3 to 72.2 over the image-based HACO, and it rarely reports contact when the hand touches nothing.</p>
-    <div class="controls reveal">
-      <div class="seg glass small" role="group" aria-label="Clip" id="vh-ctl">
-        <span class="seg-thumb"></span>
-        <button type="button" aria-pressed="true" data-v="toytruck">Toy assembly</button>
-        <button type="button" aria-pressed="false" data-v="cube">Rubik&rsquo;s cube</button>
-        <button type="button" aria-pressed="false" data-v="hub">USB hub</button>
-      </div>
-    </div>
-    <div class="player vh-player reveal" id="vh-player" data-sync style="--n:1; --ar: 1280 / 720">
+    <div class="player vh-player reveal" id="vh-player" data-sync style="--n:2; --ar: 998 / 1000">
       <div class="cards">
-        <div class="media-card"><video muted playsinline preload="none" data-src="assets/video/vidhaco/haco_vs_vidhaco_toytruck.mp4" poster="assets/video/vidhaco/haco_vs_vidhaco_toytruck.jpg" aria-label="An egocentric video of two hands assembling a toy truck: the right hand pushes a tire on, fits a screw and tightens it with a screwdriver. Right: contact predicted by HACO and by Vid-HACO on the right MANO hand. Bottom: contacting vertices per frame for each model."></video></div>
+        <div class="media-card"><video muted playsinline preload="none" data-src="assets/video/vidhaco/toytruck_haco.mp4" poster="assets/video/vidhaco/toytruck_haco.jpg" aria-label="HACO on an egocentric toy-truck assembly: the right-hand box turns green on frames with predicted contact, and the MANO hand below shows the predicted contact"></video><div class="tags tr"><span class="glass-tag kin">HACO</span></div></div>
+        <div class="media-card"><video muted playsinline preload="none" data-src="assets/video/vidhaco/toytruck_vidhaco.mp4" poster="assets/video/vidhaco/toytruck_vidhaco.jpg" aria-label="Vid-HACO on the same clip: the right-hand box turns green on frames with predicted contact, and the MANO hand below shows the predicted contact"></video><div class="tags tr"><span class="glass-tag ours">Vid-HACO</span></div></div>
       </div>
     </div>
-    <p class="cap reveal" id="vh-cap">Toy assembly from WGO-Bench, right hand. HACO reports contact on every frame; Vid-HACO&rsquo;s contact drops each time the hand lets go of one part to reach for the next. Both models see the same frames and tracked hand crops, thresholded at 0.52 with no smoothing.</p>
+    <p class="cap reveal" id="vh-cap">Toy assembly from WGO-Bench, right hand. The hand box turns green on frames where the model predicts contact. HACO reports contact on every frame; Vid-HACO&rsquo;s contact drops each time the hand lets go of one part to reach for the next. Both models see the same frames and tracked hand crops, thresholded at 0.52 with no smoothing.</p>
 
     <div class="chart-pair reveal" style="margin-top:42px">
       <figure class="chart-card"><figcaption>Validation split</figcaption><video class="chart" muted playsinline preload="none" data-rest="end" data-src="assets/video/charts/vidhaco_val.mp4" poster="assets/video/charts/vidhaco_val.jpg" aria-label="Bar chart of vertex F1, vertex AP and frame F1 on the validation split: Vid-HACO 84.3, 92.4, 98.3; HACO-R 74.5, 70.4, 86.1; HACO 57.1, 51.7, 86.1"></video><button class="replay glass light" type="button" aria-label="Replay chart"><svg aria-hidden="true"><use href="#i-replay"/></svg></button></figure>
@@ -406,14 +358,6 @@
       <p class="cap">ReGrind takes the object mesh as input, so it runs on GRAB only. CARD uses a contact hull as the collision object there, and the GRAB mesh only to score penetration.</p>
     </details>
 
-    <div class="sub physics reveal">
-      <h3>CARD&rsquo;s contact objective also helps physics-based retargeting</h3>
-      <p class="prose">CARD-physics builds on SPIDER, a simulation-based retargeting method: it starts from CARD&rsquo;s trajectories, replaces SPIDER&rsquo;s contact-guidance term with <span class="tex">E_{\mathrm{con}}</span> and uses CARD&rsquo;s contact force targets. Strict task success with ground-truth object trajectories:</p>
-      <div class="stat-pair">
-        <div class="stat"><span class="k">GRAB, 50 clips</span><span class="v"><span class="from">12%</span><span class="arrow" aria-hidden="true">&rarr;</span><b>32%</b></span><span class="n">SPIDER &rarr; CARD-physics</span></div>
-        <div class="stat"><span class="k">Motion capture, 50 clips</span><span class="v"><span class="from">40%</span><span class="arrow" aria-hidden="true">&rarr;</span><b>52%</b></span><span class="n">SPIDER &rarr; CARD-physics</span></div>
-      </div>
-    </div>
   </div>
 </section>
 

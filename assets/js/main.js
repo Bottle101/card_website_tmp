@@ -1,8 +1,8 @@
 // CARD project page. Plain ES modules, no build step.
-import { glassify, initSeg } from './liquid-glass.js?v=20261025a';
-import { initAnchorDemo } from './anchor.js?v=20261025a';
-import { TASKS, HANDS, TILES, FIDELITY, HERO_SEGMENTS, SCENES } from './data.js?v=20261025a';
-import { createViewer, pairViewers } from './scene3d.js?v=20261025a';
+import { glassify, initSeg } from './liquid-glass.js?v=20261026a';
+import { initAnchorDemo } from './anchor.js?v=20261026a';
+import { TASKS, HANDS, TILES, FIDELITY, HERO_SEGMENTS, SCENES } from './data.js?v=20261026a';
+import { createViewer, pairViewers } from './scene3d.js?v=20261026a';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -317,17 +317,6 @@ function initThumbs3d() {
     if (e.target.closest('[data-dragged]')) { e.preventDefault(); e.stopImmediatePropagation(); }
   }, true));
 }
-// two side-by-side renders (mocap source + its contact) as linked viewers over the images
-function halves3d(box, urls, labels) {
-  const l = document.createElement('div'), r = document.createElement('div');
-  l.className = 's3d s3d-half l'; r.className = 's3d s3d-half r'; box.classList.add('s3d-map'); box.append(l, r);
-  new IntersectionObserver((es, io) => {
-    if (!es[0].isIntersecting || !box.clientWidth) return; io.disconnect();
-    const a = createViewer(l, { label: labels[0], reset: false }), b = createViewer(r, { label: labels[1] });
-    pairViewers(a, b); a.show(urls[0]); b.show(urls[1]);
-  }, { rootMargin: '400px 0px' }).observe(box);
-}
-
 /* ------------------------------------------------------------------ baselines viewer */
 const METHODS = [['human', 'Human', 'human'], ['card', 'CARD', 'ours'], ['dexpilot', 'DexPilot', 'kin'], ['anyteleopk', 'AnyTeleop-K', 'kin'],
   ['fingertipik', 'AnyTeleop-P', 'kin'], ['init', 'CARD (init only)', 'kin']];
@@ -357,20 +346,6 @@ function initBaselines() {
 
 /* ------------------------------------------------------------------ sources: tabs + tiles */
 function initSources() {
-  const seg = $('[data-tabs="src"]'), set = $('[data-panels="src"]');
-  seg.addEventListener('pick', e => {
-    const k = e.detail.dataset.tab;
-    $$('[data-panel]', set).forEach(p => {
-      const on = p.dataset.panel === k; p.classList.toggle('on', on);
-      $$('video', p).forEach(v => { if (on) { ensureSrc(v); if (!reduced) v.play().catch(() => {}); } else v.pause(); });
-    });
-  });
-  // stage 1's source cards jump to their tab
-  $$('[data-src-tab]').forEach(a => a.addEventListener('click', () => $(`button[data-tab="${a.dataset.srcTab}"]`, seg)?.click()));
-  const pair = $('[data-panel="mocap"] .src-main.pair');
-  if (pair && SCENES.galleryFrames.includes('mocap_power'))
-    halves3d(pair, [`${S3D}gallery/mocap_power_frame.json`, `${S3D}gallery/mocap_power.json`],
-      ['Tracked hand and object, 3D: drag to rotate', 'Contact on the MANO hand, 3D: drag to rotate']);
   $$('[data-tiles]').forEach(box => {
     const list = TILES[box.dataset.tiles] || [];
     box.innerHTML = list.map(t => `<button class="tile" type="button" aria-label="${t.label}: show contact">
@@ -462,27 +437,6 @@ function initWipe() {
     const t0 = performance.now();
     const step = now => { const k = Math.min(1, (now - t0) / 1600); const x = 50 + 28 * Math.sin(k * Math.PI * 2) * (1 - k); set(x); input.value = x; if (k < 1) requestAnimationFrame(step); };
     requestAnimationFrame(step);
-  });
-}
-
-/* ------------------------------------------------------------------ Vid-HACO vs HACO (one composited clip per take, swappable) */
-const VH = {
-  toytruck: { label: 'An egocentric video of two hands assembling a toy truck: the right hand pushes a tire on, fits a screw and tightens it with a screwdriver',
-    cap: 'Toy assembly from WGO-Bench, right hand. HACO reports contact on every frame; Vid-HACO&rsquo;s contact drops each time the hand lets go of one part to reach for the next.' },
-  cube: { label: "A hand reaches for a Rubik's cube, grasps and turns it, and lets go",
-    cap: 'Phone video not used in training. HACO reports contact on every frame, including the reach before the hand touches anything; Vid-HACO stays essentially off before the grasp and after the release.' },
-  hub: { label: 'A hand reaches for a USB hub, grasps it, re-grasps it and lets go',
-    cap: 'Phone video not used in training. HACO reports contact on every frame, including the reach through the air; Vid-HACO turns on as the thumb meets the hub and off at the release.' },
-};
-const VH_SAME = ' Both models see the same frames and tracked hand crops, thresholded at 0.52 with no smoothing.';
-function initVidHaco() {
-  const p = $('#vh-player'), ctl = $('#vh-ctl'); if (!p || !ctl) return;
-  ctl.addEventListener('pick', e => {
-    const k = e.detail.dataset.v, v = $('video', p);
-    v.dataset.src = `assets/video/vidhaco/haco_vs_vidhaco_${k}.mp4`; v.poster = `assets/video/vidhaco/haco_vs_vidhaco_${k}.jpg`;
-    v.setAttribute('aria-label', `${VH[k].label}. Right: contact predicted by HACO and by Vid-HACO on the MANO hand. Bottom: contacting vertices per frame for each model.`);
-    $('#vh-cap').innerHTML = VH[k].cap + VH_SAME;
-    ensureSrc(v); p._tr.seek(0); if (!reduced) p._tr.play();
   });
 }
 
@@ -753,7 +707,6 @@ initPipeline3d();
 initSources();
 initCharts();
 initWipe();
-initVidHaco();
 initHardware();
 initOnOff();
 initEmbodiments();
