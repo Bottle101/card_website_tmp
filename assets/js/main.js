@@ -1,8 +1,8 @@
 // CARD project page. Plain ES modules, no build step.
-import { glassify, initSeg } from './liquid-glass.js?v=20261026a';
-import { initAnchorDemo } from './anchor.js?v=20261026a';
-import { TASKS, HANDS, TILES, FIDELITY, HERO_SEGMENTS, SCENES } from './data.js?v=20261026a';
-import { createViewer, pairViewers } from './scene3d.js?v=20261026a';
+import { glassify, initSeg } from './liquid-glass.js?v=20261026b';
+import { initAnchorDemo } from './anchor.js?v=20261026b';
+import { TASKS, HANDS, TILES, FIDELITY, HERO_SEGMENTS, SCENES } from './data.js?v=20261026b';
+import { createViewer, pairViewers } from './scene3d.js?v=20261026b';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -592,7 +592,6 @@ function initEmbodiments() {
     $$('.h-name', emb).forEach(c => { c.textContent = H.name; });
     $$('#emb-map img').forEach(img => img.classList.toggle('on', img.dataset.h === h));
     if (showMap) showMap(h);
-    $('#emb-note').innerHTML = H.note;
     const old = $('video', real); if (old) old.pause();
     real.innerHTML = H.real
       ? `<div class="media-card"><video muted loop playsinline preload="none" data-src="${H.real.video}" data-poster="${H.real.video.replace(/\.mp4$/, '.jpg')}" aria-label="${H.real.label}"></video><div class="tags"><span class="glass-tag ours">${H.name}</span></div><div class="tags br"><span class="glass-tag plain">${H.real.label}</span></div></div>`

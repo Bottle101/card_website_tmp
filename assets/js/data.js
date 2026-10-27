@@ -25,14 +25,10 @@ export const TASKS = [
 ];
 
 export const HANDS = {
-  sharpa: { name: 'SHARPA Wave', map: `${C}semantic/sharpa.webp`, real: { video: `${V}realworld/cube_crop.mp4`, label: "Rubik's cube pick-up" },
-    note: '22 DoF with fingertip tactile sensing. Regions map one-to-one; the pinky base maps to the pinky metacarpal.' },
-  wuji: { name: 'Wuji Hand 2', map: `${C}semantic/wuji.webp`, real: { video: `${V}realworld/mustard_crop.mp4`, label: 'Mustard palm grasp' },
-    note: 'Five three-link fingers, so regions map one-to-one. No tactile sensing, but its compliant inner surfaces conform to the object, so the grasp needs no scaling.' },
-  dex3: { name: 'Unitree Dex3-1', map: `${C}semantic/dex3.webp`, real: { video: `${V}realworld/tongs_crop.mp4`, label: 'Tong use' },
-    note: 'Three fingers: middle, ring and pinky map to the third, and anchors that touch at once merge at their force-weighted centroid. No tactile sensing, so grasp actions are scaled by a fixed 1.2&times;.' },
-  gripper: { name: 'Parallel-jaw gripper', map: `${C}semantic/gripper.webp`, real: null,
-    note: 'Two jaws: the thumb maps to one, the four fingers to the other, with distal, middle and proximal regions on the tip, middle and base of the jaw.' },
+  sharpa: { name: 'SHARPA Wave', map: `${C}semantic/sharpa.webp`, real: { video: `${V}realworld/cube_crop.mp4`, label: "Rubik's cube pick-up" } },
+  wuji: { name: 'Wuji Hand 2', map: `${C}semantic/wuji.webp`, real: { video: `${V}realworld/mustard_crop.mp4`, label: 'Mustard palm grasp' } },
+  dex3: { name: 'Unitree Dex3-1', map: `${C}semantic/dex3.webp`, real: { video: `${V}realworld/tongs_crop.mp4`, label: 'Tong use' } },
+  gripper: { name: 'Parallel-jaw gripper', map: `${C}semantic/gripper.webp`, real: null },
 };
 
 export const TILES = {

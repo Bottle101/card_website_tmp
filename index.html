@@ -14,12 +14,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
-<link rel="preload" as="image" href="assets/video/hero/hero.jpg?v=20261026a" fetchpriority="high">
-<link rel="stylesheet" href="assets/css/site.css?v=20261026a">
-<link rel="stylesheet" href="assets/css/anchor.css?v=20261026a">
+<link rel="preload" as="image" href="assets/video/hero/hero.jpg?v=20261026b" fetchpriority="high">
+<link rel="stylesheet" href="assets/css/site.css?v=20261026b">
+<link rel="stylesheet" href="assets/css/anchor.css?v=20261026b">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
-<script type="module" src="assets/js/main.js?v=20261026a"></script>
+<script type="module" src="assets/js/main.js?v=20261026b"></script>
 </head>
 <body>
 <a class="skip" href="#idea">Skip to content</a>
@@ -45,8 +45,8 @@
 <!-- ============================================================ hero -->
 <header class="hero" id="top">
   <div class="hero-media" aria-hidden="true">
-    <img class="hero-poster" src="assets/video/hero/hero.jpg?v=20261026a" width="1920" height="1080" alt="">
-    <video id="hero-video" muted loop playsinline preload="none" data-video="assets/video/hero/hero.mp4?v=20261026a" tabindex="-1"></video>
+    <img class="hero-poster" src="assets/video/hero/hero.jpg?v=20261026b" width="1920" height="1080" alt="">
+    <video id="hero-video" muted loop playsinline preload="none" data-video="assets/video/hero/hero.mp4?v=20261026b" tabindex="-1"></video>
   </div>
   <div class="hero-shade"></div>
   <nav class="hero-nav" aria-label="Primary">
@@ -101,7 +101,7 @@
 <section class="sec light" id="idea">
   <div class="wrap">
     <h2 class="reveal">Current retargeting methods ignore contact dynamics</h2>
-    <p class="lead reveal">Kinematic retargeting maps fingertip positions or joint angles from the human hand to the robot hand. Differences in hand size and kinematics leave the robot links a median 20&ndash;25&nbsp;mm from the demonstrated contacts, so a replayed grasp hovers, slips or crushes the object. CARD instead preserves each contact&rsquo;s location, push direction and force, and places the corresponding robot link on it.</p>
+    <p class="lead reveal">Kinematic retargeting maps fingertip positions or joint angles from the human hand to the robot hand. CARD instead preserves each contact&rsquo;s location, push direction and force, and places the corresponding robot link on it.</p>
 
     <div class="cmp-grid reveal" id="baselines">
       <figure class="cmp-case" style="margin:0" data-clip="hanger">
@@ -119,8 +119,7 @@
 <!-- ============================================================ method: five stages, framework left, illustration right -->
 <section class="sec light" id="method">
   <div class="wrap">
-    <h2 class="reveal">CARD methodology</h2>
-    <p class="lead reveal">A demonstration is reduced to contact force anchors on the hand (1&ndash;2). For every frame, a closed-form initialization and a sampling-based optimization place the robot hand on those anchors (3&ndash;4), and a tactile tracking controller replays the result (5).</p>
+    <h2 class="reveal">The five stages of CARD</h2>
 
     <div class="method-grid">
       <div class="method-fig" aria-label="CARD framework">
@@ -187,7 +186,7 @@
         <article class="stage" id="stage-2" data-stage="2" style="--stage: var(--s2)">
           <div class="stage-crop" aria-hidden="true"></div>
           <h3><span class="stage-mark" aria-hidden="true">2</span>Unified hand&ndash;contact representation</h3>
-          <p>Every source becomes a MANO hand mesh sequence with fixed semantic regions (three per finger, plus the palm) and at most one contact force anchor <span class="tex">C_f=(c_f,\hat d_f,F_f)</span> per region and frame: a position, a push direction and a force magnitude. Anchors are attached to the hand surface rather than to the object, so no object model is needed.</p>
+          <p>Each source becomes a MANO hand sequence with at most one contact force anchor <span class="tex">C_f=(c_f,\hat d_f,F_f)</span> per hand region and frame, attached to the hand rather than the object.</p>
           <figure class="anchor-fig">
             <div class="af-img"><img src="assets/img/fig/unified_hand.webp" alt="MANO hand with colored hand regions and one anchor arrow per region; the thumb anchor is labelled with its position c_f, push direction d_f and force F_f" loading="lazy"><i>regions and anchors</i></div>
             <div class="af-img"><img src="assets/img/fig/unified_closeup.webp" alt="Close-up of the thumb tip with its contact force anchor: the center of pressure c_f, the push direction d_f and the force F_f as the arrow length" loading="lazy"><i>thumb-tip anchor</i></div>
@@ -235,8 +234,7 @@
           <div class="eq">
             <div class="tex display">q^{\star}=\arg\min_{q\in\mathcal Q}\;E_{\mathrm{contact}}(q)+E_{\mathrm{style}}(q)+E_{\mathrm{smooth}}(q)+E_{\mathrm{collision}}(q)</div>
           </div>
-          <p><span class="tex">E_{\mathrm{contact}}</span> places each anchored robot link on its contact force target with the pad normal inside the friction cone of the push; the other terms keep fingers without contact close to the human pose, keep consecutive frames smooth and prevent collisions.</p>
-          <p>CARD minimizes this non-smooth objective with an annealed cross-entropy method (CEM) sampler on the GPU. Each frame starts midway between the previous frame&rsquo;s solution and its own geometric initialization, which carries the fingertip placement.</p>
+          <p><span class="tex">E_{\mathrm{contact}}</span> puts each anchored robot pad on its contact force target, facing the push; the other terms handle free fingers, smoothness and collisions. CARD minimizes it with an annealed CEM sampler on the GPU.</p>
           <!-- built by assets/js/anchor.js -->
           <div class="anchor-demo" id="anchor-demo"></div>
           <button type="button" class="btn-3d" data-scenes="pipeline/retarget_hand:Hand,pipeline/retarget_closeup:Friction cone" data-title="After optimization, Rubik's cube demonstration"><svg aria-hidden="true"><use href="#i-hand"/></svg>Rubik&rsquo;s cube solution in 3D</button>
@@ -246,7 +244,7 @@
         <article class="stage" id="stage-5" data-stage="5" style="--stage: var(--s5)">
           <div class="stage-crop" aria-hidden="true"></div>
           <h3><span class="stage-mark" aria-hidden="true">5</span>Tactile tracking replay</h3>
-          <p>Retargeting outputs joint targets and, for each finger in contact, a desired normal force along the push direction. During replay the arm follows the retargeted wrist. For each finger, an admittance loop on the error between the desired and the measured fingertip force closes the finger beyond its joint target until the force is reached, and a feedforward torque adds the desired force directly. The joints stay compliant, so the extra closure acts as a bounded squeeze.</p>
+          <p>Replay follows the retargeted joint targets, while each finger in contact closes a little further until its fingertip sensor reads the desired force; a feedforward torque adds that force directly.</p>
           <div class="controls" style="margin:18px 0 12px">
             <div class="seg glass light small" role="group" aria-label="Force tracking test" data-chart="force">
               <span class="seg-thumb"></span>
@@ -268,7 +266,7 @@
 <section class="sec dark" id="sources">
   <div class="wrap">
     <h2 class="reveal">Three sources, one representation</h2>
-    <p class="lead reveal">Each source ends as the same anchored MANO sequence, so one set of solver weights serves all three.</p>
+    <p class="lead reveal">Each source outputs the same anchored MANO sequence, so one solver serves all three.</p>
     <div class="src3 reveal">
       <div class="src-col" id="src-video">
         <h3>Phone video</h3>
@@ -303,13 +301,13 @@
         <div class="media-card"><video muted playsinline preload="none" data-src="assets/video/vidhaco/toytruck_vidhaco.mp4" poster="assets/video/vidhaco/toytruck_vidhaco.jpg" aria-label="Vid-HACO on the same clip: the right-hand box turns green on frames with predicted contact, and the MANO hand below shows the predicted contact"></video><div class="tags tr"><span class="glass-tag ours">Vid-HACO</span></div></div>
       </div>
     </div>
-    <p class="cap reveal" id="vh-cap">Toy assembly from WGO-Bench, right hand. The hand box turns green on frames where the model predicts contact. HACO reports contact on every frame; Vid-HACO&rsquo;s contact drops each time the hand lets go of one part to reach for the next. Both models see the same frames and tracked hand crops, thresholded at 0.52 with no smoothing.</p>
+    <!-- <p class="cap reveal" id="vh-cap">Toy assembly from WGO-Bench, right hand. The hand box turns green on frames where the model predicts contact. HACO reports contact on every frame; Vid-HACO&rsquo;s contact drops each time the hand lets go of one part to reach for the next. Both models see the same frames and tracked hand crops, thresholded at 0.52 with no smoothing.</p> -->
 
     <div class="chart-pair reveal" style="margin-top:42px">
       <figure class="chart-card"><figcaption>Validation split</figcaption><video class="chart" muted playsinline preload="none" data-rest="end" data-src="assets/video/charts/vidhaco_val.mp4" poster="assets/video/charts/vidhaco_val.jpg" aria-label="Bar chart of vertex F1, vertex AP and frame F1 on the validation split: Vid-HACO 84.3, 92.4, 98.3; HACO-R 74.5, 70.4, 86.1; HACO 57.1, 51.7, 86.1"></video><button class="replay glass light" type="button" aria-label="Replay chart"><svg aria-hidden="true"><use href="#i-replay"/></svg></button></figure>
       <figure class="chart-card"><figcaption>HRDexDB, held out</figcaption><video class="chart" muted playsinline preload="none" data-rest="end" data-src="assets/video/charts/vidhaco_hrdexdb.mp4" poster="assets/video/charts/vidhaco_hrdexdb.jpg" aria-label="Bar chart of vertex F1, vertex AP and frame F1 on held-out HRDexDB: Vid-HACO 67.2, 72.2, 95.3; HACO-R 62.6, 54.5, 75.9; HACO 63.3, 54.3, 75.9"></video><button class="replay glass light" type="button" aria-label="Replay chart"><svg aria-hidden="true"><use href="#i-replay"/></svg></button></figure>
     </div>
-    <p class="cap reveal">HACO-R is HACO retrained on the same 12 datasets as Vid-HACO. Frame F1 scores whether a frame is in contact at all; flagging every frame scores 86.1 and 75.9.</p>
+    <!-- <p class="cap reveal">HACO-R is HACO retrained on the same 12 datasets as Vid-HACO. Frame F1 scores whether a frame is in contact at all; flagging every frame scores 86.1 and 75.9.</p> -->
   </div>
 </section>
 
@@ -319,7 +317,7 @@
 <section class="sec light" id="results">
   <div class="wrap">
     <h2 class="reveal">Contact on 43% of anchor-frames, kinematic baselines under 5%</h2>
-    <p class="lead reveal">167 demonstrations retargeted to the SHARPA Wave: our 67 clips (video, glove, motion capture) and 100 GRAB clips. A contact is established when the anchor lies within 2&nbsp;mm of the assigned link and is reached with its palmar face.</p>
+    <!-- <p class="lead reveal">167 demonstrations retargeted to the SHARPA Wave: our 67 clips (video, glove, motion capture) and 100 GRAB clips. A contact is established when the anchor lies within 2&nbsp;mm of the assigned link and is reached with its palmar face.</p> -->
 
     <div class="controls reveal" id="fid-ctl">
       <div class="seg glass light small" role="group" aria-label="Metric" data-k="metric">
@@ -421,7 +419,7 @@
         <div class="media-card" data-side="on"><img src="assets/video/tactile/hammer_on.jpg" alt="With the tactile tracker: hammer held" loading="lazy"><div class="tags"><span class="glass-tag ours">Tactile tracker on</span></div><div class="tags br"><span class="glass-tag ours res">Held · 8/10 trials</span></div><div class="of-bar" aria-hidden="true"><b></b><i></i></div></div>
         <div class="media-card" data-side="off"><img src="assets/video/tactile/hammer_off.jpg" alt="Position replay only: hammer slips" loading="lazy"><div class="tags"><span class="glass-tag plain">Tactile tracker off</span></div><div class="fail-call" aria-hidden="true"><span class="glass-tag bad"><svg aria-hidden="true"><use href="#i-warn"/></svg><span class="txt"></span></span></div><div class="tags br"><span class="glass-tag bad res">Slipped · 1/10 trials</span></div><div class="of-bar" aria-hidden="true"><b></b><i></i></div></div>
       </div>
-      <p class="cap reveal">Red spans on each timeline mark where the run without the tracker fails. The two card runs replay the same trajectory at different speeds (about 0.7&times; and 1&times;), so they line up only at the start.</p>
+      <!-- <p class="cap reveal">Red spans on each timeline mark where the run without the tracker fails. The two card runs replay the same trajectory at different speeds (about 0.7&times; and 1&times;), so they line up only at the start.</p> -->
     </div>
 
     <div class="sub" id="curved">
@@ -430,7 +428,7 @@
       <div class="curved reveal">
         <figure>
           <div class="media-card"><video muted loop playsinline preload="none" class="inview" data-src="assets/video/tracker/curved_disturb.mp4" poster="assets/video/tracker/curved_disturb.jpg" aria-label="The SHARPA Wave holds a block on a barrel while an operator pushes and turns the barrel"></video><div class="tags"><span class="glass-tag plain">Barrel moved by hand</span></div></div>
-          <figcaption class="cap">An operator pushes and turns the barrel while the arm stays still; the fingers follow the surface without losing the block.</figcaption>
+          <!-- <figcaption class="cap">An operator pushes and turns the barrel while the arm stays still; the fingers follow the surface without losing the block.</figcaption> -->
         </figure>
         <figure>
           <div class="media-card"><video muted loop playsinline preload="none" class="inview" data-src="assets/video/tracker/curved_sweep.mp4" poster="assets/video/tracker/curved_sweep.jpg" aria-label="The arm carries the hand down the barrel's curved side while the fingers keep the block pressed"></video><div class="tags"><span class="glass-tag plain">Arm moves along the barrel</span></div></div>
@@ -465,7 +463,6 @@
     <div class="emb-map reveal">
       <div>
         <div class="map-img"><div class="swap" id="emb-map"></div></div>
-        <p class="note" id="emb-note" style="margin-top:14px"></p>
       </div>
       <div id="emb-real"></div>
     </div>
