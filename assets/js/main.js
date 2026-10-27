@@ -1,8 +1,8 @@
 // CARD project page. Plain ES modules, no build step.
-import { glassify, initSeg } from './liquid-glass.js?v=20261026b';
-import { initAnchorDemo } from './anchor.js?v=20261026b';
-import { TASKS, HANDS, TILES, FIDELITY, HERO_SEGMENTS, SCENES } from './data.js?v=20261026b';
-import { createViewer, pairViewers } from './scene3d.js?v=20261026b';
+import { glassify, initSeg } from './liquid-glass.js?v=20261026c';
+import { initAnchorDemo } from './anchor.js?v=20261026c';
+import { TASKS, HANDS, TILES, FIDELITY, HERO_SEGMENTS, SCENES } from './data.js?v=20261026c';
+import { createViewer, pairViewers } from './scene3d.js?v=20261026c';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -385,17 +385,21 @@ function initCharts() {
     });
   });
 
-  // contact fidelity: our clips left, GRAB right, for the picked metric (penetration needs the object mesh: GRAB only)
+  // contact fidelity: our data left (video or glove + mocap), GRAB right, for the picked metric;
+  // penetration needs a ground-truth object mesh, so it is shown for GRAB only
   const ctl = $('#fid-ctl'), pair = $('#fid-pair'); if (!ctl || !pair) return;
   const metSeg = $('[data-k="metric"]', ctl);
-  metSeg.addEventListener('pick', () => {
-    const met = pressed(metSeg).dataset.v;
-    $$('[data-bed]', pair).forEach(card => {
-      const v = $('video', card), na = $('.chart-na', card), none = card.dataset.bed === 'own67' && met === 'pen';
-      v.hidden = none; if (na) na.hidden = !none;
-      if (!none) setChart(v, `assets/video/charts/fidelity_${card.dataset.bed}_${met}.mp4`);
-    });
-  });
+  const show = card => {
+    const met = pressed(metSeg).dataset.v, bed = card.dataset.bed, v = $('video', card), na = $('.chart-na', card), none = bed !== 'grab' && met === 'pen';
+    v.hidden = none; if (na) na.hidden = !none;
+    if (!none) setChart(v, `assets/video/charts/fidelity_${bed}_${met}.mp4`);
+  };
+  metSeg.addEventListener('pick', () => $$('[data-bed]', pair).filter(c => c.matches('figure')).forEach(show));
+  $$('.bed-switch button', pair).forEach(b => b.addEventListener('click', () => {
+    const card = b.closest('figure');
+    $$('button', b.parentElement).forEach(x => x.setAttribute('aria-pressed', x === b));
+    card.dataset.bed = b.dataset.bed; show(card);
+  }));
 }
 
 /* ------------------------------------------------------------------ wipe compare */

@@ -687,3 +687,9 @@ a.src-icon:hover { box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--stage)
 .src3 .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 @media (max-width: 860px) { .src3 { grid-template-columns: minmax(0, 1fr); gap: 40px; } }
 @media (max-width: 600px) { .hero h1 .acc { white-space: normal; } .hero h1 .h1-name { gap: .14em; } }
+/* results: the 'our data' chart switches between its two beds */
+.chart-card .chart-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.bed-switch { display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: rgba(0,0,0,.06); }
+.bed-switch button { border: 0; padding: 4px 10px; border-radius: 999px; background: none; font: 600 12.5px/1.3 var(--font); color: var(--ink2); cursor: pointer; }
+.bed-switch button[aria-pressed="true"] { background: #fff; color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+.chart-card .chart-head { min-height: 46px; }
