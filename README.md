@@ -38,7 +38,4 @@ To publish, push the contents of this folder to a GitHub Pages branch (or any st
 
 ## Before publishing
 
-Search `index.html` for `TODO`:
-- author names, affiliations and links (the paper is still in anonymized submission mode)
-- Paper, arXiv and Code links (the buttons are disabled until then)
-- the BibTeX author field
+Search `index.html` for `TODO`: the Code button stays disabled until the code URL exists. Authors, the arXiv links and the BibTeX follow https://arxiv.org/abs/2610.36539.

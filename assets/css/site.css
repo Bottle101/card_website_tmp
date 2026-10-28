@@ -217,7 +217,7 @@ h3 { font-size: clamp(21px, 2vw, 26px); line-height: 1.2; font-weight: 700; lett
 .hero-nav, .hero-content, .hero-bottom { width: min(1320px, calc(100% - 96px)); margin-inline: auto; }
 .hero-nav { display: flex; justify-content: space-between; align-items: center; padding-top: 30px; }
 .wordmark { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font-family: var(--mono); font-weight: 700; font-size: 15px; letter-spacing: .02em; }
-.wordmark svg { width: 22px; height: 28px; }
+.wordmark img { width: auto; height: 28px; }
 .hero-nav-links { display: flex; gap: 30px; font-size: 13.5px; }
 .hero-nav-links a { text-decoration: none; color: rgba(236,236,238,.82); transition: color .2s; }
 .hero-nav-links a:hover { color: #fff; }
@@ -235,7 +235,11 @@ h3 { font-size: clamp(21px, 2vw, 26px); line-height: 1.2; font-weight: 700; lett
 .hero-abstract[open] summary::after { margin-top: 3px; transform: rotate(-135deg); }
 .hero-abstract summary:hover { background: rgba(255,255,255,.13); }
 .hero-abstract p { margin: 12px 0 0; padding: 16px 20px; border-radius: 16px; font-size: 14.5px; line-height: 1.62; color: rgba(236,236,238,.84); background: rgba(14,14,16,.62); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); text-wrap: pretty; }
-.hero-authors { margin: 22px 0 0; font-size: 14.5px; color: rgba(236,236,238,.9); }
+.hero-authors { margin: 22px 0 0; max-width: 720px; }
+.hero-authors p { margin: 0; }
+.hero-authors .names { font-size: 15px; line-height: 1.6; color: rgba(236,236,238,.92); }
+.hero-authors .affil { margin-top: 4px; font-size: 12.5px; line-height: 1.55; color: rgba(236,236,238,.6); }
+.hero-authors sup { font-size: .72em; line-height: 0; margin-left: 1px; }
 .hero-authors .note { display: block; margin-top: 4px; font-size: 12.5px; color: rgba(236,236,238,.58); }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
 .hero-actions .btn { color: #fff; background: linear-gradient(180deg, rgba(255,255,255,.15), rgba(255,255,255,.06)); box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 6px 22px rgba(0,0,0,.28); }
@@ -268,7 +272,7 @@ h3 { font-size: clamp(21px, 2vw, 26px); line-height: 1.2; font-weight: 700; lett
 .topnav.on-dark nav a.active { background: rgba(255,255,255,.12); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); }
 .topnav .wrap { height: 100%; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .topnav .wordmark { font-size: 14px; }
-.topnav .wordmark svg { width: 17px; height: 22px; }
+.topnav .wordmark img { width: auto; height: 23px; }
 .topnav nav { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
 .topnav nav::-webkit-scrollbar { display: none; }
 .topnav nav a { position: relative; padding: 8px 12px; border-radius: 999px; font-size: 13.5px; font-weight: 500; text-decoration: none; color: var(--ink2); white-space: nowrap; transition: color .2s, background .2s; }

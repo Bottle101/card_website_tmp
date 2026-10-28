@@ -8,24 +8,25 @@
 <meta property="og:title" content="CARD: Contact-Anchored Retargeting for Dexterous Manipulation">
 <meta property="og:description" content="Contact-anchored retargeting of human hand demonstrations to robot hands, replayed open-loop with a tactile tracking controller.">
 <meta property="og:image" content="assets/video/hero/hero.jpg">
+<meta name="citation_title" content="CARD: Contact-Anchored Retargeting for Dexterous Manipulation">
+<meta name="citation_arxiv_id" content="2610.36539">
 <meta name="theme-color" content="#0e0e10">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 28'%3E%3Crect x='1' y='1' width='20' height='26' rx='4' fill='%23121214' stroke='%23ececee' stroke-width='2'/%3E%3Ccircle cx='11' cy='15' r='3.4' fill='%236cc79b'/%3E%3C/svg%3E">
+<link rel="icon" type="image/png" href="assets/img/card_joker.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
-<link rel="preload" as="image" href="assets/video/hero/hero.jpg?v=20261026c" fetchpriority="high">
-<link rel="stylesheet" href="assets/css/site.css?v=20261026c">
-<link rel="stylesheet" href="assets/css/anchor.css?v=20261026c">
+<link rel="preload" as="image" href="assets/video/hero/hero.jpg?v=20261027a" fetchpriority="high">
+<link rel="stylesheet" href="assets/css/site.css?v=20261027a">
+<link rel="stylesheet" href="assets/css/anchor.css?v=20261027a">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
-<script type="module" src="assets/js/main.js?v=20261026c"></script>
+<script type="module" src="assets/js/main.js?v=20261027a"></script>
 </head>
 <body>
 <a class="skip" href="#idea">Skip to content</a>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <symbol id="i-card" viewBox="0 0 22 28"><rect x="1" y="1" width="20" height="26" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="11" cy="15" r="3.4" fill="#6cc79b"/><path d="M11 15 L11 6.5" stroke="#e8731f" stroke-width="2" stroke-linecap="round"/></symbol>
   <symbol id="i-play" viewBox="0 0 14 14"><path d="M3 1.6v10.8L12.2 7z" fill="currentColor"/></symbol>
   <symbol id="i-pause" viewBox="0 0 14 14"><rect x="2.4" y="1.6" width="3.2" height="10.8" rx="1" fill="currentColor"/><rect x="8.4" y="1.6" width="3.2" height="10.8" rx="1" fill="currentColor"/></symbol>
   <symbol id="i-warn" viewBox="0 0 16 16"><path d="M8 1.8 14.8 13.6H1.2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 6.2v3.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="8" cy="11.8" r="1" fill="currentColor"/></symbol>
@@ -45,12 +46,12 @@
 <!-- ============================================================ hero -->
 <header class="hero" id="top">
   <div class="hero-media" aria-hidden="true">
-    <img class="hero-poster" src="assets/video/hero/hero.jpg?v=20261026c" width="1920" height="1080" alt="">
-    <video id="hero-video" muted loop playsinline preload="none" data-video="assets/video/hero/hero.mp4?v=20261026c" tabindex="-1"></video>
+    <img class="hero-poster" src="assets/video/hero/hero.jpg?v=20261027a" width="1920" height="1080" alt="">
+    <video id="hero-video" muted loop playsinline preload="none" data-video="assets/video/hero/hero.mp4?v=20261027a" tabindex="-1"></video>
   </div>
   <div class="hero-shade"></div>
   <nav class="hero-nav" aria-label="Primary">
-    <a class="wordmark" href="#top" aria-label="CARD, back to top"><svg aria-hidden="true"><use href="#i-card"/></svg>CARD</a>
+    <a class="wordmark" href="#top" aria-label="CARD, back to top"><img src="assets/img/card_joker.png" width="188" height="256" alt="">CARD</a>
     <div class="hero-nav-links">
       <a href="#idea">Idea</a><a href="#method">Method</a><a href="#sources">Sources</a><a href="#vidhaco">Vid-HACO</a><a href="#results">Results</a><a href="#hardware">Hardware</a><a href="#embodiments">Embodiments</a><a href="#cite">Cite</a>
     </div>
@@ -60,16 +61,19 @@
     <p class="hero-summary">CARD extracts, preserves, and tracks contact force targets from human demonstrations.</p>
     <details class="hero-abstract">
       <summary>Abstract</summary>
-      <p>Humans are dexterous, but traditional data collection paradigms such as teleoperation, kinesthetic teaching, and wearable exoskeletons force humans to act through the robot embodiment, bottlenecking their dexterity. Retargeting can avoid this. However, existing methods purely translate kinematics and ignore the real-world contact dynamics essential for task success. We present CARD: Contact-Anchored Retargeting for Dexterous Manipulation, a simulator- and object-free framework that retargets human demonstrations to robot actions by explicitly preserving contact force targets. CARD unifies human data sources including video, motion capture, and tactile gloves via a shared hand&ndash;contact representation and generates explicit contact force targets in addition to kinematics. To maintain these contact targets during open-loop replay on hardware, CARD also introduces a tactile tracking controller. For video, which contains no explicit tactile source, we present Vid-HACO, our video-to-contact model that sets a new state of the art. Across our video, glove and motion-capture data and the GRAB dataset, CARD maintains contact on 43&ndash;78% of contact frames, while kinematic and object-aware retargeting methods maintain contact on under 10% and 22.5% of the frames, respectively. Further, integrating our formulation into physics-based retargeting improves strict task success from 12% to 32% on GRAB. Finally, we show that our tactile tracker is critical to reproduce demonstrated forces during hardware replay. These results establish that contact preservation via CARD is a scalable interface for transferring human dexterity to robots.</p>
+      <p>Humans are dexterous, but traditional data collection paradigms such as teleoperation, kinesthetic teaching, and wearable exoskeletons force humans to act through the robot embodiment, bottlenecking their dexterity. Retargeting can avoid this. However, existing methods purely translate kinematics and ignore the real-world contact dynamics essential for task success. We present CARD: Contact-Anchored Retargeting for Dexterous Manipulation, a simulator and object-free framework that retargets human demonstrations to robot actions by explicitly preserving contact force targets. CARD unifies human data sources including video, motion capture, and tactile gloves via a shared hand&ndash;contact representation and generates explicit contact force targets in addition to kinematics. To maintain these contact targets during hardware open-loop replay, CARD also introduces a tactile tracking controller. For video which does not contain an explicit tactile source, we present Vid-HACO, our video-to-contact model that sets a new state of the art. Across our video, glove, motion-capture data and the GRAB dataset, CARD maintains contact on 43&ndash;78% of contact frames, while kinematic and object-aware retargeting methods maintain contact on &lt;10% and 22.5% of the frames respectively. Further, integrating our formulation into physics-based retargeting improves strict task success from 12% to 32% on GRAB dataset. Finally, we show that our tactile tracker is critical to reproduce demonstrated forces during hardware replay. These results establish that contact preservation via CARD is a scalable interface for transferring human dexterity to robots.</p>
     </details>
-    <!-- TODO(authors): the paper is still anonymized. Replace with names, affiliations and links at release. -->
-    <p class="hero-authors">Anonymous authors</p>
+    <div class="hero-authors">
+      <p class="names">Cunxi Dai<sup>1,2</sup>, Botao He<sup>3,2*</sup>, Francois R. Hogan<sup>2*</sup>, Wei Pan<sup>2*</sup>, Rao Fu<sup>4,2</sup>, Wen-Han Hsieh<sup>1</sup>, Ruoshi Liu<sup>3,2</sup>, Jitendra Malik<sup>4,2</sup>, Guanya Shi<sup>1,2&dagger;</sup>, Akash Sharma<sup>2&dagger;</sup></p>
+      <p class="affil"><sup>1</sup>Carnegie Mellon University &nbsp; <sup>2</sup>Amazon Frontier AI &amp; Robotics (FAR) &nbsp; <sup>3</sup>University of Maryland, College Park &nbsp; <sup>4</sup>UC Berkeley</p>
+      <p class="affil"><sup>*</sup>Core contributor &nbsp; <sup>&dagger;</sup>Equal advising</p>
+    </div>
     <div class="hero-actions">
       <a class="glass btn lg" href="#hardware"><svg aria-hidden="true"><use href="#i-video"/></svg>Videos</a>
       <a class="glass btn lg" href="#cite"><svg aria-hidden="true"><use href="#i-quote"/></svg>BibTeX</a>
-      <!-- TODO(links): paper PDF, arXiv and code URLs -->
-      <a class="glass btn lg" href="#" aria-disabled="true" title="Link to come"><svg aria-hidden="true"><use href="#i-paper"/></svg>Paper</a>
-      <a class="glass btn lg" href="#" aria-disabled="true" title="Link to come"><svg aria-hidden="true"><use href="#i-arxiv"/></svg>arXiv</a>
+      <a class="glass btn lg" href="https://arxiv.org/pdf/2610.36539"><svg aria-hidden="true"><use href="#i-paper"/></svg>Paper</a>
+      <a class="glass btn lg" href="https://arxiv.org/abs/2610.36539"><svg aria-hidden="true"><use href="#i-arxiv"/></svg>arXiv</a>
+      <!-- TODO(links): code URL -->
       <a class="glass btn lg" href="#" aria-disabled="true" title="Link to come"><svg aria-hidden="true"><use href="#i-code"/></svg>Code</a>
     </div>
   </div>
@@ -87,7 +91,7 @@
 
 <div class="topnav" id="topnav">
   <div class="wrap">
-    <a class="wordmark" href="#top"><svg aria-hidden="true"><use href="#i-card"/></svg>CARD</a>
+    <a class="wordmark" href="#top"><img src="assets/img/card_joker.png" width="188" height="256" alt="">CARD</a>
     <nav aria-label="Sections">
       <a href="#idea">Idea</a><a href="#method">Method</a><a href="#sources">Sources</a><a href="#vidhaco">Vid-HACO</a><a href="#results">Results</a><a href="#hardware">Hardware</a><a href="#embodiments">Embodiments</a><a href="#cite">Cite</a>
     </nav>
@@ -401,9 +405,9 @@
         <div class="cards">
           <div class="media-card"><video muted playsinline preload="none" data-src="assets/video/tracker/cardflip_contact.mp4" poster="assets/video/tracker/cardflip_contact.jpg" aria-label="Left: the SHARPA Wave picks up the top card and lays it face-up, with the tactile tracker on. Right: which fingertips have a contact target, and each finger's desired normal force over time. Thumb and index carry targets from about 4.6 to 8 and 9 seconds; middle, ring and pinky carry none."></video></div>
         </div>
-      <!-- </div>
-      <p class="cap reveal">The panel shows the targets the tracker follows; fingertip forces were not logged for this run.</p>
-    </div> -->
+      </div>
+      <!-- <p class="cap reveal">The panel shows the targets the tracker follows; fingertip forces were not logged for this run.</p> -->
+    </div>
 
     <div class="sub" id="tracker">
       <h3 class="reveal">Same trajectory, with and without the tactile tracker</h3>
@@ -478,11 +482,14 @@
 <section class="sec dark" id="cite">
   <div class="wrap">
     <h2 class="reveal" style="font-size:clamp(26px,2.6vw,34px)">Citation</h2>
-    <!-- TODO(authors): replace the author field at release -->
-    <div class="bib reveal" id="bib"><button class="bib-copy glass btn" type="button">Copy</button><code id="bib-text">@misc{card2026,
-  title  = {{CARD}: Contact-Anchored Retargeting for Dexterous Manipulation},
-  author = {Anonymous Authors},
-  year   = {2026}
+    <div class="bib reveal" id="bib"><button class="bib-copy glass btn" type="button">Copy</button><code id="bib-text">@misc{dai2026card,
+  title         = {{CARD}: Contact-Anchored Retargeting for Dexterous Manipulation},
+  author        = {Cunxi Dai and Botao He and Francois R. Hogan and Wei Pan and Rao Fu and Wen-Han Hsieh and Ruoshi Liu and Jitendra Malik and Guanya Shi and Akash Sharma},
+  year          = {2026},
+  eprint        = {2610.36539},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.RO},
+  url           = {https://arxiv.org/abs/2610.36539}
 }</code></div>
   </div>
 </section>

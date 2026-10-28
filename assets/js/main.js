@@ -1,8 +1,8 @@
 // CARD project page. Plain ES modules, no build step.
-import { glassify, initSeg } from './liquid-glass.js?v=20261026c';
-import { initAnchorDemo } from './anchor.js?v=20261026c';
-import { TASKS, HANDS, TILES, FIDELITY, HERO_SEGMENTS, SCENES } from './data.js?v=20261026c';
-import { createViewer, pairViewers } from './scene3d.js?v=20261026c';
+import { glassify, initSeg } from './liquid-glass.js?v=20261027a';
+import { initAnchorDemo } from './anchor.js?v=20261027a';
+import { TASKS, HANDS, TILES, FIDELITY, HERO_SEGMENTS, SCENES } from './data.js?v=20261027a';
+import { createViewer, pairViewers } from './scene3d.js?v=20261027a';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
